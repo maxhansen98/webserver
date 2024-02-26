@@ -62,11 +62,11 @@ fi
 for item in "${PRODUCTION_FILES[@]}"; do
     if [ -d "$item" ]; then
         find "$item"/* -exec cp -r {} "$SERVER_CGI_DIR/" \;
-        find "$item" -type f -exec chmod 777 {} +
+        find "$item" -type f -exec chmod 755 {} +
         echo "Copied contents of directory $item to $SERVER_CGI_DIR"
     elif [ -f "$item" ]; then
         cp "$item" "$SERVER_CGI_DIR"
-        chmod 777 "$SERVER_CGI_DIR/$(basename "$item")"
+        chmod 755 "$SERVER_CGI_DIR/$(basename "$item")"
         echo "Copied file $item to $SERVER_CGI_DIR"
     else
         echo "Error: $item is neither a directory nor a file."
