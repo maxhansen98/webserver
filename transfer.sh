@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s globstar
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -58,26 +59,14 @@ if [ -z "$PRODUCTION_FILES" ]; then
     fi
 fi
 
-for file in "${PRODUCTION_FILES[@]}"; do
-    dir_path=$(dirname "$file")
-    mkdir -p "$SERVER_CGI_DIR/$dir_path"
-    if [ -d "$file" ]; then
-        cp -r "$file" "$SERVER_CGI_DIR/$dir_path/"
-    else
-        cp "$file" "$SERVER_CGI_DIR/$dir_path/"
-    fi
-    chmod 755 "$SERVER_CGI_DIR/$dir_path/$(basename "$file")"
-    echo "Copied $file to $SERVER_CGI_DIR/$dir_path/"
-done
-
-for item in "${PRODUCTION_ITEMS[@]}"; do
+for item in "${PRODUCTION_FILES[@]}"; do
     if [ -d "$item" ]; then
-        find "$item" -type f -exec cp --parents {} "$SERVER_CGI_DIR" \;
-        find "$item" -type f -exec chmod 755 "$SERVER_CGI_DIR/{}" \;
-        echo "Copied files from directory $item to $SERVER_CGI_DIR"
+        find "$item"/* -exec cp -r {} "$SERVER_CGI_DIR/" \;
+        find "$item" -type f -exec chmod 777 {} +
+        echo "Copied contents of directory $item to $SERVER_CGI_DIR"
     elif [ -f "$item" ]; then
         cp "$item" "$SERVER_CGI_DIR"
-        chmod 755 "$SERVER_CGI_DIR/$(basename "$item")"
+        chmod 777 "$SERVER_CGI_DIR/$(basename "$item")"
         echo "Copied file $item to $SERVER_CGI_DIR"
     else
         echo "Error: $item is neither a directory nor a file."
