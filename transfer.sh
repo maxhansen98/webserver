@@ -69,3 +69,17 @@ for file in "${PRODUCTION_FILES[@]}"; do
     chmod 755 "$SERVER_CGI_DIR/$dir_path/$(basename "$file")"
     echo "Copied $file to $SERVER_CGI_DIR/$dir_path/"
 done
+
+for item in "${PRODUCTION_ITEMS[@]}"; do
+    if [ -d "$item" ]; then
+        find "$item" -type f -exec cp --parents {} "$SERVER_CGI_DIR" \;
+        find "$item" -type f -exec chmod 755 "$SERVER_CGI_DIR/{}" \;
+        echo "Copied files from directory $item to $SERVER_CGI_DIR"
+    elif [ -f "$item" ]; then
+        cp "$item" "$SERVER_CGI_DIR"
+        chmod 755 "$SERVER_CGI_DIR/$(basename "$item")"
+        echo "Copied file $item to $SERVER_CGI_DIR"
+    else
+        echo "Error: $item is neither a directory nor a file."
+    fi
+done
