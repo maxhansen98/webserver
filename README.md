@@ -3,6 +3,8 @@
 Follow these steps to set up and configure the environment for your specific needs:
 
 1. **Environment Setup:**
+   - Create a new local branch `git checkout -b webserver`
+   - Or switch to webserver branch `git checkout webserver`
    - Pull this branch `git pull origin webserver`
    - (Optional: If no .env is set up, any input for the file handling script must be provided via command line parameters) Create an .env file in the root of the project  `nano .env` and add the following lines and adjust for your individual needs:
      
