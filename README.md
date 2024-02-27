@@ -17,8 +17,8 @@ Follow these steps to set up and configure the environment for your specific nee
    - Save your local changes to the app directory
    - If you have set up an .env file, run `bash transfer.sh`
    - If you HAVEN'T set up an .env file, run `bash transfer.sh -d /ABSOLUTE/PATH/TO/CGI/SERVERS/PUBLIC/DIR -p /ABSOLUTE/PATH/TO/THIS/blockgruppe3/app`
-   - The file handling script will synchronize the app directory with the public_html directory on the CGI server (including Additions/Updates/Removals).
+   - The file handling script will synchronize the app directory with the public_html directory on the CGI server (including Additions/Updates/Removals)
    - Your updates should now be [live](http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/home.py)
 
 3. **Push chanes to version control:**
-   - Only push your changes to remote version control after verifying that the updated webserver is functioning correctly, as testing pipelines are not currently in place.
+   - Only push your changes to remote version control after verifying that the updated webserver is functioning correctly, as testing pipelines are not currently in place
