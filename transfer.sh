@@ -1,6 +1,4 @@
 #!/bin/bash
-shopt -s globstar
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d|--server-cgi-dir)
@@ -61,7 +59,7 @@ fi
 
 for item in "${PRODUCTION_FILES[@]}"; do
     if [ -d "$item" ]; then
-        find "$item"/* -exec cp -r {} "$SERVER_CGI_DIR/" \;
+        rsync -av --delete "$item"/ "$SERVER_CGI_DIR/"
         find "$item" -type f -exec chmod 755 {} +
         echo "Copied contents of directory $item to $SERVER_CGI_DIR"
     elif [ -f "$item" ]; then
