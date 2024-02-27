@@ -8,7 +8,7 @@ Follow these steps to set up and configure the environment for your specific nee
      
       ```python
       SERVER_CGI_DIR='/ABSOLUTE/PATH/TO/CGI/SERVERS/PUBLIC/DIR'
-      PRODUCTION_FILES="/ABSOLUTE/PATH/TO/THIS/blockgruppe3/app"
+      PRODUCTION_FILES='/ABSOLUTE/PATH/TO/THIS/blockgruppe3/app'
       ```
 
 2. **Push changes to the CGI server:**   
