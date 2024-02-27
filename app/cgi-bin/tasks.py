@@ -7,27 +7,29 @@ html_content = """
     <title>3er Block</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css"> <!-- Reference to your external CSS file -->
-    <script src="../js/utils.js"></script> <!-- Reference to your external JavaScript file -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/static_data.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class='bg-gray-50'>
 
 <header class="box w-full py-3 px-12 flex flex-row justify-between items-center rounded-lg" >
-    <button id="" class="inline-block">         
-        <i class='fas fa-moon' style='color: #f2f2fb'></i>
-    </button>
-    <nav class="navbar">
+    <div class="w-1/3 flex flex-row items-center justify-start">
+         <h1 class="text-2xl font-semibold txt">Gruppe 3</h1>
+    </div>
+    <nav class="navbar w-1/3">
         <ul class="w-full flex flex-row justify-center items-center gap-8">
             <li><a href="http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/home.py" id="teamLink">Home</a></li>
             <li><a href="http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/tasks.py" id="tasksLink">Aufgaben</a></li>
         </ul>
     </nav>
-    <button id="dark-mode-toggle" class="inline-block ">
-                <i class="fas fa-moon"></i>
-    </button>
+    <div class="w-1/3 flex flex-row items-center justify-end">
+        <button id="dark-mode-toggle" class="inline-block ">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
 
 </header>
-
 
 </body>
 </html>
