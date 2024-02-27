@@ -10,6 +10,7 @@ html_content = """
     <script src="../js/utils.js"></script>
     <script src="../js/static_data.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="../public/lmu.png">
 </head>
 <body class='bg-gray-50'>
 
