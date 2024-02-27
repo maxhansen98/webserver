@@ -1,10 +1,22 @@
 body {
     transition: background-color 0.3s ease;
+    padding: 10px;
 }
+body div ul li {
+    list-style-type: disc;
+}
+
 
 .dark-mode {
     background-color: #1a202c;
     color: #ffffff;
+}
+
+.clip{
+    cursor: pointer;
+}
+.clip:hover{
+    color: #b4b7bd;
 }
 
 .container {
@@ -24,6 +36,77 @@ body {
     transition: background-color 0.3s ease;
 }
 
+
 .button:hover {
     background-color: #0056b3;
+}
+
+.box {
+    background-color: #f3f3fb;
+   
+}
+
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+}
+
+.navbar li {
+    color:#6e747e;
+    font-weight: 600;
+    font-size: medium;
+    
+}
+
+
+.navbar a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: #161e3b; /* Change color on hover */
+}
+
+.navbar a.active {
+    color: #161e3b; /* Change color for active link */
+    cursor: default;
+    pointer-events: none;
+}
+
+.profile {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    gap: 15px;
+}
+
+.profile img {
+    width: 150px; 
+    height: 150px; 
+    border-radius: 50%;
+}
+
+.profile a {
+    text-decoration: none; 
+}
+
+.txt {
+    color: #161e3b;
+}
+.txt-lgt {
+    color: #868b93;
+}
+.bg-txt {
+    background-color: #161e3b;
+}
+.bg-txt-lgt-mx {
+    background-color: #dde1e9;
+}
+.lnk {
+    color: #4285F4;
+    text-decoration: none;
+}
+.lnk:hover {
+    text-decoration: underline;
 }
