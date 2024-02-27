@@ -86,3 +86,4 @@ function generateLinks(links) {
     linksHtml += "</ul>"
     return document.getElementById("linksContainer").innerHTML = linksHtml;
 }
+

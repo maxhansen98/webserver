@@ -3,6 +3,7 @@
 Follow these steps to set up and configure the environment for your specific needs:
 
 1. **Environment Setup:**
+   - It is highly recommended to create a new directory for every branch `mkdir ./<branchname>` `cd <branchname>`
    - Create a new local branch `git checkout -b webserver`
    - Or switch to webserver branch `git checkout webserver`
    - Pull this branch `git pull origin webserver`

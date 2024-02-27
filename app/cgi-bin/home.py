@@ -21,7 +21,7 @@ html_content = """
     <nav class="navbar w-1/3">
         <ul class="w-full flex flex-row justify-center items-center gap-8">
             <li><a href="http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/home.py" id="teamLink">Home</a></li>
-            <li><a href="http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/tasks.py" id="tasksLink">Aufgaben</a></li>
+            <li><a href="http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/tasks.py" id="tasksLink">Werkbank</a></li>
         </ul>
     </nav>
     <div class="w-1/3 flex flex-row items-center justify-end">
@@ -69,7 +69,7 @@ html_content = """
         generateProfiles(group_profiles);   
         generateProfiles(ifi_profiles, true);
         generateLinks(links);
-    </script>
+</script>
 </body>
 </html>
 """
