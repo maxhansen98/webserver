@@ -1,12 +1,22 @@
 function toggleDarkMode() {
     var body = document.body;
-    body.classList.toggle("dark-mode");
+    var isDarkMode = body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode", isDarkMode ? "on" : "off");
 }
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    toggleDarkMode(); 
+function setInitialTheme() {
+    var darkMode = localStorage.getItem("darkMode");
+    if (darkMode === "on") {
+        toggleDarkMode();
+    }
 }
 
-document.getElementById("dark-mode-toggle").addEventListener("click", function() {
-    toggleDarkMode();
+document.addEventListener("DOMContentLoaded", function() {
+    setInitialTheme();
+    var darkModeToggle = document.getElementById("dark-mode-toggle");
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("click", function() {
+            toggleDarkMode();
+        });
+    }
 });

@@ -1,25 +1,15 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 0;
-    margin: 0;
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode {
+    background-color: #1a202c;
+    color: #ffffff;
 }
 
 .container {
-    max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
-}
-
-h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #333;
-}
-
-p {
-    font-size: 1.2rem;
-    line-height: 1.5;
-    color: #666;
+    text-align: center;
 }
 
 .button {
@@ -36,10 +26,4 @@ p {
 
 .button:hover {
     background-color: #0056b3;
-}
-
-/* Dark mode styles */
-.dark-mode {
-    background-color: #222;
-    color: #fff;
 }

@@ -14,7 +14,7 @@ html_content = """
     <div class="container mx-auto px-4 py-8 text-center">
         <h1 class='text-3xl font-bold text-gray-800'>Welcome to My Website</h1>
         <p class='text-lg text-gray-600 mt-4'>This is a simple landing page served by a Python CGI script.</p>
-        <button onclick="toggleDarkMode()" class="mt-8 inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+        <button id="dark-mode-toggle" class="mt-8 inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
             <i class="fas fa-moon"></i> Toggle Dark Mode
         </button>
         <a href="about.cgi" class="mt-8 inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Learn More</a>
