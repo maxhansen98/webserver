@@ -30,6 +30,15 @@ html_content = """
     </div>
 
 </header>
+<div class="bg-gray-50 flex flex-col items-start justify-start gap-4 mt-4">
+    <div class=" box relative w-full rounded-lg flex flex-col justify-start items-center">
+        <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
+            <h1 class="text-base font-normal txt-lgt">Gruppe:</h1>
+            <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+            <div id="profilesContainer" class="w-full flex flex-row justify-between items-center"></div>        
+        </div>
+    </div>    
+</div>
 <div class="bg-gray-50 flex flex-row items-start justify-start gap-4 mt-4">
     <div class=" box w-2/4 relative rounded-lg flex flex-col justify-start items-center">
         <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
@@ -45,24 +54,13 @@ html_content = """
             <div id="linksContainer" class="w-full flex flex-row justify-between items-center"></div>        
         </div>
     </div>
-</div>
-<div class="bg-gray-50 flex flex-col items-start justify-start gap-4 mt-4">
-    <div class=" box relative w-full rounded-lg flex flex-col justify-start items-center">
-        <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
-            <h1 class="text-base font-normal txt-lgt">Gruppe:</h1>
-            <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
-            <div id="profilesContainer" class="w-full flex flex-row justify-between items-center"></div>        
-        </div>
-    </div>
-    <div class=" box w-full rounded-lg flex flex-col justify-start items-center ">
+    <div class=" box w-1/4 relative rounded-lg flex flex-col justify-start items-center">
         <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
             <h1 class="text-base font-normal txt-lgt">Betreuer:</h1>
             <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
             <div id="ifiProfilesContainer" class="w-full flex flex-row justify-between items-center"></div>        
         </div>
     </div>
-
-    
     
 </div>
 <script type="module">

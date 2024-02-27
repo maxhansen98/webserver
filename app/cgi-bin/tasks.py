@@ -27,12 +27,7 @@ html_content = """
     </button>
 
 </header>
-<div class="h-3"></div>
-<div class="box w-full rounded-lg flex flex-col justify-start items-start">
-    <div class="box w-full rounded-lg flex flex-col justify-start items-start">
-        <h1 class='text-base font-bold text-gray-800'>Das Team:</h1>
-    </div
-</div>
+
 
 </body>
 </html>

@@ -13,6 +13,7 @@ export var ifi_profiles = [
 ];
 
 export var links = [
-    { name: "LMU Gitlab", link:""},
-    { name: "Report card", link:""}
+    { name: "LMU Gitlab", link:"https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3"},
+    { name: "Report card", link:"https://docs.google.com/spreadsheets/d/1e-2aziQAUbwPtcy_ziBT2Ba_VHlZe0w1q-kbK7Bz-Yk/edit#gid=611133691"},
+    { name: "Website code", link:"https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/webserver?ref_type=heads"}
 ];

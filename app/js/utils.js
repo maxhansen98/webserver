@@ -42,16 +42,15 @@ function copyToClipboard(text) {
 function generateProfiles(profiles, ifi=false) {
     var profilesHtml = "";
     if (ifi) {
+        profilesHtml += `<ul>`
         profiles.forEach(function(profile) {
             profilesHtml += `
-                <div class="profile">
-                    <div class "flex flex-col justify-start items-start gap-4>
-                        <p class="txt text-xl font-normal">${profile.name}</p>
-                    </div>
-                </div>
+            <li class="ml-4">
+                <p class="txt text-sm font-normal">${profile.name}</p>
+            </li>
             `;
         });
-
+        profilesHtml += `</ul>`
         return document.getElementById("ifiProfilesContainer").innerHTML = profilesHtml;
     }
     else {
@@ -61,8 +60,9 @@ function generateProfiles(profiles, ifi=false) {
                     <img src="${profile.image}" alt="${profile.name}">
                     <div class "flex flex-col justify-start items-start gap-4>
                         <p class="txt text-xl font-normal">${profile.name}</p>
-                        <a href="${profile.link}"><p class="lnk text-sm font-normal">@${profile.profile}</p></a>
-                        <p class="txt-lgt text-sm font-normal italic clip" onclick="">${profile.discord}</p>
+                        <p class="txt-lgt text-sm font-normal underline ">GitHub:
+                        <a href="${profile.link}"><p class="lnk text-sm font-normal">@${profile.profile}</p></a></p>
+                        <p class="txt-lgt text-sm font-normal underline ">Discord:<p class="txt-lgt text-sm font-normal italic clip" onclick="">${profile.discord}</p></p>
                     </div>
                 </div>
             `;
