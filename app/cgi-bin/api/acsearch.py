@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 import json
+import sys
 import subprocess
 import re
 import cgi
 
 
-def execute_subprocess(organism_patterns):    
-    command = ["python3", "/home/h/hummelj/propra/8_genome_report/genome_length.py", "--organism"]
-    organisms = re.findall(r'"([^"]*)"', organism_patterns)
-    for organism in organisms:
-        command.append(organism)
+def execute_subprocess(acnumbers_b):    
+    command = ["python3", "/home/h/hummelj/propra/acsearch/acsearch.py", "--ac"]
+    acnumbers = re.findall(r'"([^"]*)"', acnumbers_b)
+    for acnumber in acnumbers:
+        command.append(acnumber)
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     if result.returncode == 0:
         return {
@@ -25,10 +26,10 @@ def main():
     print("Content-Type: application/json\n")
     form = cgi.FieldStorage()
     try:
-        organism_patterns = form.getvalue('organism')
-        if organism_patterns is not None:
+        acnumbers = form.getvalue('ac')
+        if acnumbers is not None:
             # Process the form data or execute subprocess here
-            result = {'data': execute_subprocess(organism_patterns)}
+            result = {'data': execute_subprocess(acnumbers)}
         else:
             result = {'error': 'Missing organism_patterns'}
     except Exception as e:
