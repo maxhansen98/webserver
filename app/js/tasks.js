@@ -1,7 +1,7 @@
 
 //{ id:1, name: "Genome Report", repo_link: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "file", accept: "image/*, .pdf, .docx" , default:{path:"/home/h/hummelj/propra/blockgruppe3/var/default/genome"}}]}}
 var tasks = [
-    { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "text", default:{path:"Escherichia coli; Actinomyces oris"}}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
+    { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
 ];
 
 function openTasks(open_tasks) {
@@ -25,8 +25,11 @@ function openTasks(open_tasks) {
                         <div class="flex flex-row items-center justify-start px-4 gap-2">
                             <p class="text-xs font-normal txt-lgt">${param.name}:</p>
                             <form>
-                            <input class="box border border-gray-300 px-2 py-0.5 text-xs font-normal txt-lgt rounded-sm w-64" type="text" name="${param.name}" ${param.required ? 'required' : ''}>
+                                <input id="in_${param.name}" class="box border border-gray-300 px-2 py-0.5 text-xs font-normal txt-lgt rounded-sm w-96" type="text" name="${param.name}" ${param.required ? 'required' : ''}>
                             </form>
+                            <p class="text-xs font-normal txt-lgt">Example:</p>
+                            <p class="text-xs font-normal txt-lgt italic">${param.default}</p>
+                        
                         </div>
                     `;
                       break;
@@ -35,7 +38,7 @@ function openTasks(open_tasks) {
                         <div class="flex flex-row items-center justify-start px-4 gap-2">
                             <p class="text-xs font-normal txt-lgt">${param.name}:</p>
                             <form id="formElem">
-                                <input class="box py-0.5 text-xs font-normal txt-lgt w-64" type="file" name="${param.name}" ${param.required ? 'required' : ''} ${param.accept ? 'accept="' + param.accept + '"' : ''}>
+                                <input class="box py-0.5 text-xs font-normal txt-lgt w-96" type="file" name="${param.name}" ${param.required ? 'required' : ''} ${param.accept ? 'accept="' + param.accept + '"' : ''}>
                                 <input type="submit">
                             </form>
                         </div>
@@ -99,7 +102,7 @@ function openTasks(open_tasks) {
                                     for (const [key, value] of Object.entries(data)) {
                                         const p = document.createElement('p');
                                         p.className = 'text-xs font-normal txt-lgt';
-                                        p.innerHTML = key + ': ' + value.output;
+                                        p.innerHTML = value.output;
                                         outputSection.appendChild(p);
                                     }
                                 })
@@ -118,7 +121,25 @@ function openTasks(open_tasks) {
                         </div>
                     </div>
                     <div id="outputTag" class="mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2 hidden">
-                        <h1 class="text-sm font-semibold italic txt-lgt">Output:</h1>
+                        <div id="outputTag" class="flex flex-row justify-between items-start w-full">    
+                            <h1 class="text-sm font-semibold italic txt-lgt">Output:</h1>
+                            <button id="btnhide" onclick="{
+                                const outputSection = document.getElementById('outputSection');
+                                outputSection.className = 'hidden';
+                                const slf = document.getElementById('btnhide');
+                                const opn = document.getElementById('btnopen');
+                                slf.className = 'hidden';
+                                opn.className = '';
+                            }"><p class="lnk text-xs font-semibold">Hide</p></a></button>
+                            <button class="hidden" id="btnopen" onclick="{
+                                const outputSection = document.getElementById('outputSection');
+                                outputSection.className = 'w-full flex flex-col justify-start items-start gap-2 px-4';
+                                const hd = document.getElementById('btnhide');
+                                const slf = document.getElementById('btnopen');
+                                hd.className = '';
+                                slf.className = 'hidden';
+                            }"><p class="lnk text-xs font-semibold">Open</p></a></button>
+                        </div>
                         <div id="outputSection" class="w-full flex flex-col justify-start items-start gap-2 px-4" style="${codeFontStyle}"></div>
                     </div>
                 </div>

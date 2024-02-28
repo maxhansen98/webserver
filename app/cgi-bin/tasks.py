@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-
+import cgi
+import subprocess
 html_content = """
 <!DOCTYPE html>
 <html>
@@ -44,10 +45,33 @@ html_content = """
         openTasks([1]);
     });
 </script>
+<h1>Extract ORFs</h1>
+    <form action="tasks.py" method="post" enctype="multipart/form-data">
+        <label for="organism_file">Organism File:</label>
+        <input type="file" name="organism_file" id="organism_file" required><br><br>
+        <label for="features_file">Features File:</label>
+        <input type="file" name="features_file" id="features_file" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
 
 </body>
 </html>
 """
+form = cgi.FieldStorage()
+if 'organism_file' in form and 'features_file' in form:
+    # Get the uploaded file names
+    organism_file = form['organism_file'].filename
+    features_file = form['features_file'].filename
+
+    # Call the Python script with the provided arguments
+    result = subprocess.run(['/home/h/hummelj/propra/genome2orf/genome2orf.py', '--organism', organism_file, '--features', features_file], capture_output=True, text=True)
+
+    # Print the result
+    print("<pre>")
+    print(result.stdout)
+    print("</pre>")
+
+
 
 print("Content-type: text/html\n\n")
 print(html_content)
