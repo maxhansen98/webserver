@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3er Block</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css"> <!-- Reference to your external CSS file -->
+    <script src="./js/utils.js"></script>
+    <script src="./js/static_data.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="./public/lmu.png">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+    </script>
+    <script> 
+       $(function(){
+        $("#header").load("header.html", function() {
+            // This code runs after the header content has been loaded
+            var url = window.location.href;
+            if (url.includes("index.html")) {
+                document.getElementById("teamLink").classList.add("active");
+            } else if (url.includes("tools.html")) {
+                document.getElementById("tasksLink").classList.add("active");
+            }
+
+        }); 
+    });
+    </script> 
+</head>
+<body class='bg-gray-50'>
+    <div id="header"></div>
+
+    
+
+    <div class="bg-gray-50 flex flex-col items-start justify-start gap-4 mt-4">
+        <div class=" box relative w-full rounded-lg flex flex-col justify-start items-center">
+            <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
+                <h1 class="text-base font-normal txt-lgt">Gruppe:</h1>
+                <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+                <div id="profilesContainer" class="w-full flex flex-row justify-between items-center"></div>        
+            </div>
+        </div>    
+    </div>
+    <div class="bg-gray-50 flex flex-row items-start justify-start gap-4 mt-4">
+        <div class=" box w-2/4 relative rounded-lg flex flex-col justify-start items-center">
+            <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
+                <h1 class="text-base font-normal txt-lgt">Letzte Commits:</h1>
+                <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+                
+            </div>
+        </div>
+        <div class=" box w-1/4 relative rounded-lg flex flex-col justify-start items-center">
+            <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
+                <h1 class="text-base font-normal txt-lgt">Links:</h1>
+                <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+                <div id="linksContainer" class="w-full flex flex-row justify-between items-center"></div>        
+            </div>
+        </div>
+        <div class=" box w-1/4 relative rounded-lg flex flex-col justify-start items-center">
+            <div class="py-4 flex flex-col justify-start items-start w-11/12 gap-2">
+                <h1 class="text-base font-normal txt-lgt">Betreuer:</h1>
+                <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+                <div id="ifiProfilesContainer" class="w-full flex flex-row justify-between items-center"></div>        
+            </div>
+        </div>
+        
+    </div>
+    <script type="module">
+            import { group_profiles, ifi_profiles, links} from "./js/static_data.js"
+            generateProfiles(group_profiles);   
+            generateProfiles(ifi_profiles, true);
+            generateLinks(links);
+    </script>
+</body>
+</html>

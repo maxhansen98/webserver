@@ -3,6 +3,7 @@ import json
 import sys
 import subprocess
 import re
+import cgi
 
 
 def execute_subprocess(organism_patterns):    
@@ -23,19 +24,20 @@ def execute_subprocess(organism_patterns):
         }
 def main():
     print("Content-Type: application/json\n")
-    body = json.loads(sys.stdin.read())
+    form = cgi.FieldStorage()
     try:
-        organism_patterns = body.get('organism')
-        result = {'data':execute_subprocess(organism_patterns)}
-    except KeyError:
-        result = {'error': 'Missing organism_patterns'}
-    
-
-    
-
+        organism_patterns = form.getvalue('organism')
+        if organism_patterns is not None:
+            # Process the form data or execute subprocess here
+            result = {'data': execute_subprocess(organism_patterns)}
+        else:
+            result = {'error': 'Missing organism_patterns'}
+    except Exception as e:
+        result = {'error': str(e)}
 
     # Print JSON response
     print(json.dumps(result))
+
 
 if __name__ == "__main__":
     main()

@@ -1,16 +1,3 @@
-function toggleDarkMode() {
-    var body = document.body;
-    var isDarkMode = body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", isDarkMode ? "on" : "off");
-}
-
-function setInitialTheme() {
-    var darkMode = localStorage.getItem("darkMode");
-    if (darkMode === "on") {
-        toggleDarkMode();
-    }
-}
-
 document.addEventListener("DOMContentLoaded", function() {
     setInitialTheme();
     var darkModeToggle = document.getElementById("dark-mode-toggle");
@@ -21,14 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-document.addEventListener("DOMContentLoaded", function() {
-    var url = window.location.href;
-    if (url.includes("home.py")) {
-        document.getElementById("teamLink").classList.add("active");
-    } else if (url.includes("tasks.py")) {
-        document.getElementById("tasksLink").classList.add("active");
-    }
-});
+
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
         .then(() => {

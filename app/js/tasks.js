@@ -1,13 +1,39 @@
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //{ id:1, name: "Genome Report", repo_link: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "file", accept: "image/*, .pdf, .docx" , default:{path:"/home/h/hummelj/propra/blockgruppe3/var/default/genome"}}]}}
 var tasks = [
     { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
+    { id:2, name: "DNA to RNA", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/10_dna2rna?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "file", default:''},{name:"Features", required:true, type: "file", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
 ];
+
 
 function openTasks(open_tasks) {
     var tasksHtml = "";
     open_tasks.forEach(function(task_id) {
-        console.log("tid: ", task_id)
         const task = tasks.find(task => task.id === task_id);
         if (task) {
             tasksHtml += `
@@ -38,8 +64,7 @@ function openTasks(open_tasks) {
                         <div class="flex flex-row items-center justify-start px-4 gap-2">
                             <p class="text-xs font-normal txt-lgt">${param.name}:</p>
                             <form id="formElem">
-                                <input class="box py-0.5 text-xs font-normal txt-lgt w-96" type="file" name="${param.name}" ${param.required ? 'required' : ''} ${param.accept ? 'accept="' + param.accept + '"' : ''}>
-                                <input type="submit">
+                                <input class="box py-0.5 text-xs font-normal txt-lgt w-96" type="file" name="${param.name}" ${param.required ? 'required' : ''} >
                             </form>
                         </div>
                         `;
