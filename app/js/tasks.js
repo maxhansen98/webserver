@@ -1,7 +1,7 @@
 
 //{ id:1, name: "Genome Report", repo_link: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "file", accept: "image/*, .pdf, .docx" , default:{path:"/home/h/hummelj/propra/blockgruppe3/var/default/genome"}}]}}
 var tasks = [
-    { id:1, name: "Genome Report", repo_link: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "text", default:{path:"Escherichia coli; Actinomyces oris"}}]}},
+    { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism", required:true, type: "text", default:{path:"Escherichia coli; Actinomyces oris"}}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
 ];
 
 function openTasks(open_tasks) {
@@ -51,8 +51,12 @@ function openTasks(open_tasks) {
             
             tasksHtml += `
                         <div class="w-full flex flex-row items-center justify-end px-4 gap-4">
-                            <button><p class="lnk text-xs font-semibold">Undo</p></a></button>
-                            <button onclick="
+                        <link rel="stylesheet" href="../css/styles.css"> 
+                        <div id="loadingAnimation" style="display: none;" class="text-xs font-semibold txt-lgt">
+                        Loading...
+                        </div>
+                        <button><p id="undoButton" class="lnk text-xs font-semibold">Undo</p></a></button>
+                        <button onclick="
                             {
                                 
                                 const task = tasks.find(task => task.id === ${task.id});
@@ -72,7 +76,15 @@ function openTasks(open_tasks) {
                                     });
                                 });
                                 console.log('js: ', jsonData);
-                                fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py', {
+                                const loadingAnimation = document.getElementById('loadingAnimation');
+                                const runButton = document.getElementById('runButton');
+                                const undoButton = document.getElementById('undoButton');
+                                loadingAnimation.style.display = 'inline-block';
+                                runButton.className = 'text-blue-300 text-xs font-semibold hover:cursor-not-allowed';
+                                undoButton.className = 'text-blue-300 text-xs font-semibold hover:cursor-not-allowed';
+                                
+                            
+                                fetch('${task.api_url}', {
                                     method: 'POST',
                                     body: JSON.stringify(jsonData),
                                     contentType: 'application/json'
@@ -80,6 +92,8 @@ function openTasks(open_tasks) {
                                 .then(response => response.json())
                                 .then(data => {
                                     console.log(data);
+                                    const outputTag = document.getElementById('outputTag');
+                                    outputTag.className = 'mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2';
                                     const outputSection = document.getElementById('outputSection');
                                     outputSection.innerHTML = '';
                                     for (const [key, value] of Object.entries(data)) {
@@ -88,16 +102,22 @@ function openTasks(open_tasks) {
                                         p.innerHTML = key + ': ' + value.output;
                                         outputSection.appendChild(p);
                                     }
-                                }
-                                )
+                                })
+                                .finally(() => {
+                                    loadingAnimation.style.display = 'none';
+                                    runButton.className = 'lnk text-xs font-semibold';
+                                    undoButton.className = 'lnk text-xs font-semibold';
+                                
+                                });
                                 
                             }
-                            "><p class="lnk text-xs font-semibold">Run</p></a></button>
+                            "><p id="runButton" class="lnk text-xs font-semibold">Run</p></a></button>
+                            
                             
                             </form>
                         </div>
                     </div>
-                    <div class="mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2">
+                    <div id="outputTag" class="mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2 hidden">
                         <h1 class="text-sm font-semibold italic txt-lgt">Output:</h1>
                         <div id="outputSection" class="w-full flex flex-col justify-start items-start gap-2 px-4" style="${codeFontStyle}"></div>
                     </div>
