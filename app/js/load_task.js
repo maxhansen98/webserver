@@ -1,32 +1,30 @@
 const tasks = [
     { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism(s)", id:"organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
     { id:2, name: "AC Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/acsearch", input:{parameters:[{name:"AC number", id:"ac", required:true, type: "text", default:'"P12345"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/acsearch.py"},
+    { id:3, name: "Swissprot Keyword Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/spkeyword?ref_type=heads", input:{parameters:[{name:"Keyword(s)", id:"keyword", required:true, type: "text", default:'"Atherosclerosis" "Endonuclease"'},{name:"Swissprot", id:"swissprot", required:true, type: "file", default:'swissprot45_head.dat'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/spksearch.py"},
     
     
 ]
-function runTask(task_id) {
+function runATask(task_id) {
     const task = tasks.find(task => task.id === task_id);
     const fd = new FormData();
     task.input.parameters.forEach(function(param) {
-        document.querySelectorAll('input').forEach(function(tag) {
-            console.log(param);
-            if (param.name===tag.name){
-                const input_id = param.id;
-                const input_data = tag.value;
-                if (input_data !== undefined){  
-                    fd.append(input_id, input_data);                                             
-                }
-            }
-        });
+        if (param.type === 'text') {
+            const inputElement = document.getElementById(`in_${param.name}_${task_id}`); 
+            fd.append(param.id, inputElement.value);
+        } else if (param.type === 'file') {
+            const fileElement = document.getElementById(`in_${param.name}_${task_id}`);
+            const file = fileElement.files[0];
+            fd.append(param.id, file);
+        }
     });
     console.log(...fd);
-    const loadingAnimation = document.getElementById('loadingAnimation');
-    const runButton = document.getElementById('runButtonText');
-    const undoButton = document.getElementById('undoButtonText');
+    const loadingAnimation = document.getElementById('loadingAnimation_' + task_id);
+    const runButton = document.getElementById('runButtonText_' + task_id);
+    const undoButton = document.getElementById('undoButtonText_' + task_id);
     loadingAnimation.style.display = 'inline-block';
     runButton.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
     undoButton.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
-
     fetch(task.api_url, {
         method: 'POST',
         body: fd
@@ -41,7 +39,11 @@ function runTask(task_id) {
         for (const [key, value] of Object.entries(data)) {
             const p = document.createElement('p');
             p.className = 'text-xs font-normal txt-lgt';
-            p.innerHTML = value.output;
+            if(value.output !== undefined){
+                p.innerHTML = value.output;
+            } else {
+                p.innerHTML = value.error;
+            }
             outputSection.appendChild(p);
         }
     })
@@ -51,9 +53,8 @@ function runTask(task_id) {
         undoButton.className = 'lnk text-xs font-semibold';
     
     });
-    
-    
 }
+
 
 function loadTasks() {
     const tasksContainer = document.getElementById("tasksContainer");
@@ -61,44 +62,18 @@ function loadTasks() {
     tasks.forEach(task=>{
         const children = task.input.parameters.map(param => {
             const input = inputTag(param, task.id);
-            const process = processingTag(param, task.id);
-            const output = outputTag(task.id);
-            return input + process + output;
+            
+            return input;
            
         }).join('');
         const taskHtml = basicTask(task, children);
         const taskElement = document.createElement("div");
         taskElement.innerHTML = taskHtml.trim();
-        
         tasksContainer.appendChild(taskElement.firstChild);
-
     });
 
-    console.log("test ", tasksContainer);
 }
-function processingTag(param, task_id) {
-    const codeFontStyle = "font-family: 'Courier New', Courier, monospace; font-style: italic;";
-    const processElement = document.createElement("div");
-    
 
-    processElement.classList.add("flex", "flex-row", "items-center", "justify-end", "gap-2", "w-full");
-    processElement.innerHTML = `
-
-                    <div id="loadingAnimation" style="display: none;" class="text-xs font-semibold txt-lgt">
-                        Loading...
-                    </div> 
-                    <button id="undoButton"><p id="undoButtonText" class="lnk text-xs font-semibold">Undo</p></a></button>
-                    <button id="runButton" onclick="runTask(${task_id})"><p id="runButtonText" class="lnk text-xs font-semibold">Run</p></a></button>
-                            
-            	
-            `;
-
-    console.log("processElement ", processElement.querySelector("#runButton"));
-
-    return processElement.outerHTML;
-
-
-}
 
 
 function outputTag(task_id) {
@@ -144,28 +119,66 @@ function inputTag(param, task_id) {
                     <p class="text-xs font-normal txt-lgt italic">${param.default}</p>
             	</div>
             `;
-        case 'input':
+        case 'file':
+            return `
+                <div class="flex flex-row items-center justify-start px-4 gap-2">
+                    <p class="text-xs font-normal txt-lgt">${param.name}:</p>
+                    <form>
+                        <input id="in_${param.name}_${task_id}" class="bg-transparent text-xs font-normal txt-lgt rounded-sm mx-2 my-0.5" type="file" name="${param.name}" ${param.required ? 'required' : ''}>
+                    </form>
+                    <p class="text-xs font-normal txt-lgt">Example:</p>
+                    <p class="text-xs font-normal txt-lgt italic">${param.default}</p>
+                </div>
+                
+            `;
         default:
             
     }
 }
 
 function basicTask(task, children) {
+    const codeFontStyle = "font-family: 'Courier New', Courier, monospace; font-style: italic;";
     const taskHtml = `
         <div class="flex flex-col justify-center items-center w-full rounded-lg box p-4">
             <div class="flex flex-col justify-start items-start w-full gap-2">
-                <h1 class="text-base font-normal txt-lgt">${task.name}:</h1>
+                <div class="flex flex-row justify-between w-full">
+                    <h1 class="text-base font-normal txt-lgt">${task.name}:</h1>
+                    <a class="cursor-pointer" href="${task.repo_url}" target="_blank"><img src="https://gitlab2.cip.ifi.lmu.de/assets/logo-911de323fa0def29aaf817fca33916653fc92f3ff31647ac41d2c39bbe243edb.svg" width="20" height="20" /></a>
+                </div>
                 <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
                 <div class="mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2">
-                    <div class="flex flex-row justify-between w-full">
-                        <h1 class="text-sm font-semibold italic txt-lgt">Input:</h1>                    
-                        <a class="cursor-pointer" href="${task.repo_url}" target="_blank"><img src="https://gitlab2.cip.ifi.lmu.de/assets/logo-911de323fa0def29aaf817fca33916653fc92f3ff31647ac41d2c39bbe243edb.svg" width="20" height="20" /></a>
-                    </div>
+                    <h1 class="text-sm font-semibold italic txt-lgt">Input:</h1>                    
                     ${children}
+                </div>
+                <div class="flex flex-row justify-end items-center gap-2 w-full">
+                    <div id="loadingAnimation_${task.id}" style="display: none;" class="text-xs font-semibold txt-lgt">Loading...</div> 
+                    <button id="undoButton_${task.id}"><p id="undoButtonText_${task.id}" class="lnk text-xs font-semibold">Undo</p></button>
+                    <button id="runButton_${task.id}" onclick="runATask(${task.id})"><p id="runButtonText_${task.id}" class="lnk text-xs font-semibold">Run</p></button>
+                </div>
+                <div id="outputTag_${task.id}" class="mt-2 border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2 hidden">
+                    <div class="flex flex-row justify-between items-start w-full">    
+                        <h1 class="text-sm font-semibold italic txt-lgt">Output:</h1>
+                        <button id="btnhide_${task.id}" onclick="{
+                            const outputSection = document.getElementById('outputSection_${task.id}');
+                            outputSection.className = 'hidden';
+                            const slf = document.getElementById('btnhide_${task.id}');
+                            const opn = document.getElementById('btnopen_${task.id}');
+                            slf.className = 'hidden';
+                            opn.className = '';
+                        }"><p class="lnk text-xs font-semibold">Hide</p></a></button>
+                        <button class="hidden" id="btnopen_${task.id}" onclick="{
+                            const outputSection = document.getElementById('outputSection_${task.id}');
+                            outputSection.className = 'w-full flex flex-col justify-start items-start gap-2 px-4';
+                            const hd = document.getElementById('btnhide_${task.id}');
+                            const slf = document.getElementById('btnopen_${task.id}');
+                            hd.className = '';
+                            slf.className = 'hidden';
+                        }"><p class="lnk text-xs font-semibold">Open</p></a></button>
+                    </div>
+                    <div id="outputSection_${task.id}" class="w-full flex flex-col justify-start items-start gap-2 px-4" style="${codeFontStyle}"></div>
                 </div>
             </div>
         </div>
-
     `;
     return taskHtml;
 }

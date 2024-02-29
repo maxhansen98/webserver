@@ -41,7 +41,7 @@ function generateProfiles(profiles, ifi=false) {
                     <div class "flex flex-col justify-start items-start gap-4>
                         <p class="txt text-xl font-normal">${profile.name}</p>
                         <p class="txt-lgt text-sm font-normal underline ">GitHub:
-                        <a href="${profile.link}"><p class="lnk text-sm font-normal">@${profile.profile}</p></a></p>
+                        <a href="${profile.link}" target="_blank"><p class="lnk text-sm font-normal">@${profile.profile}</p></a></p>
                         <p class="txt-lgt text-sm font-normal underline ">Discord:<p class="txt-lgt text-sm font-normal italic clip" onclick="">${profile.discord}</p></p>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ function generateLinks(links) {
     links.forEach(function(link) {
         linksHtml += `
             <li class="ml-4">
-                <a href="${link.link}"><p class="lnk text-sm font-normal">${link.name}</p></a>
+                <a href="${link.link}" target="_blank"><p class="lnk text-sm font-normal">${link.name}</p></a>
             </li>
         `;
     });

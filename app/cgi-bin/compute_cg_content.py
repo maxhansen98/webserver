@@ -12,7 +12,7 @@ HTML = """
 <body>
 
   <h1>Upload tha Fasta File</h1>
-  <form action="compute_gc_content.py" method="POST" enctype="multipart/form-data">
+  <form action="compute_cg_content.py" method="POST" enctype="multipart/form-data">
     File: <input name="file" type="file">
     <input name="submit" type="submit">
 </form>
