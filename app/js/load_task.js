@@ -2,7 +2,9 @@ const tasks = [
     { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism(s)", id:"organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
     { id:2, name: "AC Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/acsearch", input:{parameters:[{name:"AC number", id:"ac", required:true, type: "text", default:'"P12345"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/acsearch.py"},
     { id:3, name: "Swissprot Keyword Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/spkeyword?ref_type=heads", input:{parameters:[{name:"Keyword(s)", id:"keyword", required:true, type: "text", default:'"Atherosclerosis" "Endonuclease"'},{name:"Swissprot", id:"swissprot", required:true, type: "file", default:'swissprot45_head.dat'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/spksearch.py"},
-    { id:4, name: "Prosite Pattern Scan", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/psscan?ref_type=heads", input:{parameters:[{name:"Pattern", id:"pattern", required:true, type: "text", default:'"[LIVMF]-H-x(2)-G-{STC}-[STAGP]-x-[LIVMFY]"'},{name:"or Pattern by Prosite ID", id:"web", required:true, type: "text", default:'"PS00017"'},{name:"Sequence", id:"fasta", required:true, type: "file", default:'single.fasta'},{name:"Run on Prosite Web?", id:"extern", required:true, type: "bool", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/psscan.py"},
+    { id:4, name: "Prosite Pattern Scan", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/psscan?ref_type=heads", input:{parameters:[{name:"Pattern", id:"pattern", required:true, type: "text", default:'"[LIVMF]-H-x(2)-G-{STC}-[STAGP]-x-[LIVMFY]"'},{name:"or Pattern by Prosite ID", id:"web", required:true, type: "text", default:'"PS00017"'},{name:"Sequence", id:"fasta", required:true, type: "file", default:'multi.fasta'},{name:"Run on Prosite Web?", id:"extern", required:true, type: "bool", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/psscan.py"},
+    { id:5, name: "DNA 2 RNA", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/10_dna2rna", input:{parameters:[{name:"Genome", id:"organism", required:true, type: "file", default:'Escherichia_coli.genome.fa'},{name:"Features", id:"features", required:true, type: "file", default:'Escherichia_coli.featuretable.tsv'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/dna2rna.py"},
+   
     
 
 ]
@@ -10,7 +12,7 @@ function runATask(task_id) {
     const task = tasks.find(task => task.id === task_id);
     const fd = new FormData();
     task.input.parameters.forEach(function(param) {
-        if (param.type === 'text') {
+        if (param.type === 'text' || param.type === 'selector') {
             const inputElement = document.getElementById(`in_${param.name}_${task_id}`); 
             fd.append(param.id, inputElement.value);
         } else if (param.type === 'file') {
@@ -138,6 +140,19 @@ function inputTag(param, task_id) {
                     <form>
                         <input id="in_${param.name}_${task_id}" class="mx-2 my-0.5" type="checkbox" name="${param.name}" ${param.required ? 'required' : ''}>
                     </form>
+                </div>
+            `;
+        case 'selector':
+            return `
+                <div class="flex flex-row items-center justify-start px-4 gap-2">
+                    <p class="text-xs font-normal txt-lgt">${param.name}:</p>
+                    <form>
+                        <select id="in_${param.name}_${task_id}" class="bg-transparent border border-gray-300 px-2 py-0.5 text-xs font-normal txt-lgt rounded-sm w-96" name="${param.name}" ${param.required ? 'required' : ''}>
+                            ${param.options.map(option => `<option value="${option.value}">${option.label}</option>`).join('')}
+                        </select>
+                    </form>
+                    <p class="text-xs font-normal txt-lgt">Example:</p>
+                    <p class="text-xs font-normal txt-lgt italic">${param.default}</p>
                 </div>
             `;
         default:
