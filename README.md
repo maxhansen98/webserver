@@ -1,3 +1,6 @@
+![architecture](architecture.png "Title")
+
+
 ## Getting started
 
 Follow these steps to set up and configure the environment for your specific needs:

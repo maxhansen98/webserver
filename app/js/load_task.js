@@ -1,13 +1,58 @@
+
 const tasks = [
-    { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism(s)", id:"organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py"},
-    { id:2, name: "AC Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/acsearch", input:{parameters:[{name:"AC number", id:"ac", required:true, type: "text", default:'"P12345"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/acsearch.py"},
-    { id:3, name: "Swissprot Keyword Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/spkeyword?ref_type=heads", input:{parameters:[{name:"Keyword(s)", id:"keyword", required:true, type: "text", default:'"Atherosclerosis" "Endonuclease"'},{name:"Swissprot", id:"swissprot", required:true, type: "file", default:'swissprot45_head.dat'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/spksearch.py"},
-    { id:4, name: "Prosite Pattern Scan", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/psscan?ref_type=heads", input:{parameters:[{name:"Pattern", id:"pattern", required:true, type: "text", default:'"[LIVMF]-H-x(2)-G-{STC}-[STAGP]-x-[LIVMFY]"'},{name:"or Pattern by Prosite ID", id:"web", required:true, type: "text", default:'"PS00017"'},{name:"Sequence", id:"fasta", required:true, type: "file", default:'multi.fasta'},{name:"Run on Prosite Web?", id:"extern", required:true, type: "bool", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/psscan.py"},
-    { id:5, name: "DNA 2 RNA", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/10_dna2rna", input:{parameters:[{name:"Genome", id:"organism", required:true, type: "file", default:'Escherichia_coli.genome.fa'},{name:"Features", id:"features", required:true, type: "file", default:'Escherichia_coli.featuretable.tsv'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/dna2rna.py"},
+    { id:1, name: "Genome Report", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/8_genome_report?ref_type=heads", input:{parameters:[{name:"Organism(s)", id:"organism", required:true, type: "text", default:'"Escherichia coli" "Actinomyces oris"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/genome-length.py", output:{type: "text", format:"" , default:''}},
+    { id:2, name: "AC Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/acsearch", input:{parameters:[{name:"AC number", id:"ac", required:true, type: "text", default:'"P12345"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/acsearch.py", output:{type: "text", format:"" , default:''}},
+    { id:3, name: "Swissprot Keyword Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/spkeyword?ref_type=heads", input:{parameters:[{name:"Keyword(s)", id:"keyword", required:true, type: "text", default:'"Atherosclerosis" "Endonuclease"'},{name:"Swissprot", id:"swissprot", required:true, type: "file", default:'swissprot45_head.dat'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/spksearch.py", output:{type: "text", format:"" , default:''}},
+    { id:4, name: "Prosite Pattern Scan", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/psscan?ref_type=heads", input:{parameters:[{name:"Pattern", id:"pattern", required:true, type: "text", default:'"[LIVMF]-H-x(2)-G-{STC}-[STAGP]-x-[LIVMFY]"'},{name:"or Pattern by Prosite ID", id:"web", required:true, type: "text", default:'"PS00017"'},{name:"Sequence", id:"fasta", required:true, type: "file", default:'multi.fasta'},{name:"Run on Prosite Web?", id:"extern", required:true, type: "bool", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/psscan.py", output:{type: "text", format:"" , default:''}},
+    { id:5, name: "Genome to Protein", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/10_dna2rna", input:{parameters:[{name:"Genome", id:"organism", required:true, type: "file", default:'Escherichia_coli.genome.fa'},{name:"Features", id:"features", required:true, type: "file", default:'Escherichia_coli.featuretable.tsv'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/dna2rna.py", output:{type: "text", format:"fasta" , default:''}},
+    { id:6, name: "Protein Visualizer", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/jmol_cartoons?ref_type=heads", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"9ins"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "image", format:"jsmol" , default:''}},
+    { id:7, name: "Homstrad", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/homstrad", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"2cro"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "text", format:"alignment" , default:''}},
    
     
 
 ]
+
+function toFasta(unformattedText){
+    const lines = unformattedText.split('\n');
+
+    let fastaList = [];
+    let currentHeader = '';
+    let currentSequence = '';
+
+    // Iterate through each line
+    lines.forEach((line) => {
+        // Remove any leading or trailing whitespace
+        line = line.trim();
+
+        // Check if the line is empty
+        if (line !== '') {
+            // Check if the line starts with '>'
+            if (line.startsWith('>')) {
+                // If it starts with '>', it's a header
+                // Push the previous header and sequence to the list
+                if (currentHeader !== '') {
+                    fastaList.push({ head: currentHeader, sequence: currentSequence });
+                }
+                // Reset currentHeader to the new header
+                currentHeader = line;
+                // Reset currentSequence for the new sequence
+                currentSequence = '';
+            } else {
+                // If it doesn't start with '>', it's part of the sequence
+                // Append the line to the currentSequence
+                currentSequence += line;
+            }
+        }
+    });
+
+    // Push the last header and sequence to the list
+    if (currentHeader !== '') {
+        fastaList.push({ head: currentHeader, sequence: currentSequence });
+    }
+
+    return fastaList;
+}
+
 function runATask(task_id) {
     const task = tasks.find(task => task.id === task_id);
     const fd = new FormData();
@@ -43,12 +88,29 @@ function runATask(task_id) {
         const outputSection = document.getElementById('outputSection_' + task.id);
         outputSection.innerHTML = '';
         for (const [key, value] of Object.entries(data)) {
-            const p = document.createElement('p');
-            p.className = 'text-xs font-normal txt-lgt';
-            p.innerHTML = value.output;
-            outputSection.appendChild(p);
-        }
-    })
+            if (task.output.type === 'text') {
+                if (task.output.format === 'fasta') {
+                    const fastaList = toFasta(value.output);
+                    fastaList.forEach(fasta => {
+                        const p = document.createElement('p');
+                        p.className = 'text-xs font-normal txt-lgt break-all';
+                        p.innerHTML = fasta.head;
+                        outputSection.appendChild(p);
+                        const p2 = document.createElement('p');
+                        p2.className = 'text-xs font-normal txt-lgt break-all';
+                        p2.innerHTML = fasta.sequence;
+                        outputSection.appendChild(p2);
+                    });
+                } else {
+                    const p = document.createElement('p');
+                    p.className = 'text-xs font-normal txt-lgt break-all';
+                    p.innerHTML = value.output;
+                    outputSection.appendChild(p);
+                }                
+            } 
+        }  
+    }
+    )
     .finally(() => {
         loadingAnimation.style.display = 'none';
         runButton.className = 'lnk text-xs font-semibold';
@@ -94,14 +156,18 @@ function outputTag(task_id) {
                 }"><p class="lnk text-xs font-semibold">Hide</p></a></button>
                 <button class="hidden" id="btnopen_${task_id}" onclick="{
                     const outputSection = document.getElementById('outputSection_${task_id}');
-                    outputSection.className = 'w-full flex flex-col justify-start items-start gap-2 px-4';
+                    outputSection.className = 'w-full flex flex-col justify-start items-start px-4';
                     const hd = document.getElementById('btnhide_${task_id}');
                     const slf = document.getElementById('btnopen_${task_id}');
                     hd.className = '';
                     slf.className = 'hidden';
                 }"><p class="lnk text-xs font-semibold">Open</p></a></button>
             </div>
-            <div id="outputSection_${task_id}" class="w-full flex flex-col justify-start items-start gap-2 px-4" style="${codeFontStyle}"></div>
+            <div id="outputSection_${task_id}" class="w-full flex flex-col justify-start items-start px-4 gap-2" style="${codeFontStyle}"></div>
+            <script type="text/javascript">
+                jmolApplet0 = Jmol.getApplet("jmolApplet0", {width: 500, height: 500, j2sPath: "jsmol/j2s",});
+                Jmol.script(jmolApplet0,"background black; load 1a0k.pdb; cartoon only; spin on; color structure;")
+            </script>
         </div>
     `;
 }
@@ -192,14 +258,14 @@ function basicTask(task, children) {
                         }"><p class="lnk text-xs font-semibold">Hide</p></a></button>
                         <button class="hidden" id="btnopen_${task.id}" onclick="{
                             const outputSection = document.getElementById('outputSection_${task.id}');
-                            outputSection.className = 'w-full flex flex-col justify-start items-start gap-2 px-4';
+                            outputSection.className = 'w-full flex flex-col justify-start items-start px-4';
                             const hd = document.getElementById('btnhide_${task.id}');
                             const slf = document.getElementById('btnopen_${task.id}');
                             hd.className = '';
                             slf.className = 'hidden';
                         }"><p class="lnk text-xs font-semibold">Open</p></a></button>
                     </div>
-                    <div id="outputSection_${task.id}" class="w-full flex flex-col justify-start items-start gap-2 px-4" style="${codeFontStyle}"></div>
+                    <div id="outputSection_${task.id}" class="w-full flex flex-col justify-start items-start px-4" style="${codeFontStyle}"></div>
                 </div>
             </div>
         </div>
