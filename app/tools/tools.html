@@ -3,7 +3,22 @@
 <head>
     <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
 
-    <title>3er Block</title>
+	<script type="text/javascript">
+	var Info = {
+	  width: 500,
+	  height: 500,
+	  j2sPath: "jsmol/j2s",
+	}
+	function loadPDB() {
+            var pdbId = document.getElementById("pdbId").value;
+            var pdbUrl = "https://files.rcsb.org/download/" + pdbId + ".pdb";
+
+            // Load PDB file using JSmol
+            Jmol.script(jmolApplet0, "background black; load " + pdbUrl + "; cartoon only; spin on; color structure;");
+        }
+	</script>
+
+    <title>Werkbank | 3er Block</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css"> <!-- Reference to your external CSS file -->
     <script src="../js/utils.js"></script>

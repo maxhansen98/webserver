@@ -10,9 +10,18 @@
 	  height: 500,
 	  j2sPath: "jsmol/j2s",
 	}
+	function loadPDB() {
+            var pdbId = document.getElementById("pdbId").value;
+            var pdbUrl = "https://files.rcsb.org/download/" + pdbId + ".pdb";
+
+            // Load PDB file using JSmol
+            Jmol.script(jmolApplet0, "background black; load " + pdbUrl + "; cartoon only; spin on; color structure;");
+        }
 	</script>
 </head>
 <body>
+	<input type="text" id="pdbId" placeholder="Enter PDB ID">
+    <button onclick="loadPDB()">Load PDB</button>
 	<script type="text/javascript">
 	  jmolApplet0 = Jmol.getApplet("jmolApplet0", Info);
 	  Jmol.script(jmolApplet0,"background black; load 1a0k.pdb; cartoon only; spin on; color structure;")

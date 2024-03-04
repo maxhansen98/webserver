@@ -5,8 +5,8 @@ const tasks = [
     { id:3, name: "Swissprot Keyword Search", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/spkeyword?ref_type=heads", input:{parameters:[{name:"Keyword(s)", id:"keyword", required:true, type: "text", default:'"Atherosclerosis" "Endonuclease"'},{name:"Swissprot", id:"swissprot", required:true, type: "file", default:'swissprot45_head.dat'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/spksearch.py", output:{type: "text", format:"" , default:''}},
     { id:4, name: "Prosite Pattern Scan", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/psscan?ref_type=heads", input:{parameters:[{name:"Pattern", id:"pattern", required:true, type: "text", default:'"[LIVMF]-H-x(2)-G-{STC}-[STAGP]-x-[LIVMFY]"'},{name:"or Pattern by Prosite ID", id:"web", required:true, type: "text", default:'"PS00017"'},{name:"Sequence", id:"fasta", required:true, type: "file", default:'multi.fasta'},{name:"Run on Prosite Web?", id:"extern", required:true, type: "bool", default:''}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/psscan.py", output:{type: "text", format:"" , default:''}},
     { id:5, name: "Genome to Protein", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/10_dna2rna", input:{parameters:[{name:"Genome", id:"organism", required:true, type: "file", default:'Escherichia_coli.genome.fa'},{name:"Features", id:"features", required:true, type: "file", default:'Escherichia_coli.featuretable.tsv'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/dna2rna.py", output:{type: "text", format:"fasta" , default:''}},
-    { id:6, name: "Protein Visualizer", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/jmol_cartoons?ref_type=heads", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"9ins"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "image", format:"jsmol" , default:''}},
-    { id:7, name: "Homstrad", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/homstrad", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"2cro"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "text", format:"alignment" , default:''}},
+    { id:6, name: "Homstrad", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/homstrad", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"2cro"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "text", format:"alignment" , default:''}},
+    { id:7, name: "ORF Finder", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/orf_finder?ref_type=heads", input:{parameters:[{name:"Genome", id:"fasta", required:true, type: "file", default:'Escherichia_coli.genome.fa'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/orf.py", output:{type: "text", format:"fasta" , default:''}},
    
     
 
@@ -165,7 +165,7 @@ function outputTag(task_id) {
             </div>
             <div id="outputSection_${task_id}" class="w-full flex flex-col justify-start items-start px-4 gap-2" style="${codeFontStyle}"></div>
             <script type="text/javascript">
-                jmolApplet0 = Jmol.getApplet("jmolApplet0", {width: 500, height: 500, j2sPath: "jsmol/j2s",});
+                jmolApplet0 = Jmol.getApplet("jmolApplet0", Info);
                 Jmol.script(jmolApplet0,"background black; load 1a0k.pdb; cartoon only; spin on; color structure;")
             </script>
         </div>

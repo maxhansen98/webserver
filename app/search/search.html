@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="../tools/jsmol/JSmol.min.js"></script>
+
+	<script type="text/javascript">
+	var Info = {
+	  width: 500,
+	  height: 500,
+	  j2sPath: "../tools/jsmol/j2s",
+	}
+	function loadPDB() {
+            var pdbId = document.getElementById("pdbId").value;
+            loadTasks(pdbId);
+            var pdbUrl = "https://files.rcsb.org/download/" + pdbId + ".pdb";            
+            Jmol.script(jmolApplet0, "background black; load " + pdbUrl + "; cartoon only; spin on; color structure;");
+
+        }
+	</script>
+
+    <title> Search | 3er Block</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css"> <!-- Reference to your external CSS file -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/search.js"></script>
+    <script src="../js/static_data.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="../public/lmu.png">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+    </script>
+    <script> 
+       $(function(){
+        $("#header").load("../header.html", function() {
+            // This code runs after the header content has been loaded
+            var url = window.location.href;
+            if (url.includes("index.html")) {
+                document.getElementById("teamLink").classList.add("active");
+            } else if (url.includes("tools.html")) {
+                document.getElementById("tasksLink").classList.add("active");
+            } else if (url.includes("search.html")) {
+                document.getElementById("searchLink").classList.add("active");
+            }
+        }); 
+    });
+    </script>
+   
+</head>
+<body class='bg-gray-50'>
+
+    <div id="header"></div>
+    
+    <div class="w-full flex flex-col items-start justify-start gap-4 mt-4">
+        <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4">
+            <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+                <input type="text" id="pdbId" placeholder="Enter Entry ID(s)" class="bg-transparent rounded-lg px-4 py-2 border border-gray-300 w-96">
+                <button id="search_button" onclick="loadPDB()"><p class="lnk text-lg font-semibold">Search</p></button>
+            </div>
+            
+            <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+               
+            <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+                <p class="text-xs font-normal txt-lgt">Freitext-Suche nach Sequenzen (Protein, DNA, RNA). Sie erhalten Zugang zu experimentell bestimmten 3D Strukturen des <a href="https://www.rcsb.org/" class="lnk">Protein Data Bank (PDB)</a> Archivs.
+                    Diese Daten stellen einen strukturellen Ueberblick ueber die Biologie dar.</p>
+            </div> 
+        </div>
+        
+        <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4">
+            <div class="flex flex-row justify-between items-start w-full">
+                <script  type="text/javascript">
+                    jmolApplet0 = Jmol.getApplet("jmolApplet0", Info);
+                </script>
+                <div>
+                    <div id="searchResultContainer" class="w-full flex flex-col items-center justify-start gap-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        $(document).ready(function() {
+                $.getScript("../js/search.js", function() {
+                
+                    loadTasks();
+                });
+            });
+    </script>
+</body>
+
+</html>
