@@ -7,7 +7,7 @@ import cgi
 
 def execute_subprocess(query):    
     command = ["python3", "/home/h/hummelj/propra/search/run.py", "--query", query]
-    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, encoding='utf-8')
     if result.returncode == 0:
         return {
             'success': True,

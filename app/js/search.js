@@ -1,4 +1,4 @@
-function loadTasks(args) {
+function loadSearchResult(args) {
     //console.log("success ", args)
     const fd = new FormData();
     fd.append('query', args);
@@ -8,15 +8,19 @@ function loadTasks(args) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("um ", data); 
-    }
-    )
+        const outputTag = document.getElementById('searchResultContainer');
+        outputTag.className = 'border border-gray-300 rounded-lg px-4 py-2 flex flex-col justify-start items-start w-full gap-2';
+        outputTag.innerHTML = '';
+        console.log(data);
+        Object.values(data).forEach(value => {
+            for (const [key, val] of Object.entries(value)) {
+                
+            }
+        });
+    })
     .finally(() => {
-        loadingAnimation.style.display = 'none';
-        runButton.className = 'lnk text-xs font-semibold';
-        undoButton.className = 'lnk text-xs font-semibold';
+    
     
     });
 }
-
 

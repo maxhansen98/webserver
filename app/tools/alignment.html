@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
+	<script type="text/javascript">
+	var Info = {
+	  width: 500,
+	  height: 500,
+	  j2sPath: "jsmol/j2s",
+	}
+	function loadPDB() {
+            var pdbId = document.getElementById("pdbId").value;
+            var pdbUrl = "https://files.rcsb.org/download/" + pdbId + ".pdb";
+
+            // Load PDB file using JSmol
+            Jmol.script(jmolApplet0, "background black; load " + pdbUrl + "; cartoon only; spin on; color structure;");
+        }
+	</script>
+
+    <title>Alignment | 3er Block</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css"> <!-- Reference to your external CSS file -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/static_data.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="../public/lmu.png">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+    </script>
+    <script> 
+       $(function(){
+        $("#header").load("../header.html", function() {
+            // This code runs after the header content has been loaded
+            var url = window.location.href;
+            if (url.includes("index.html")) {
+                document.getElementById("teamLink").classList.add("active");
+            } else if (url.includes("tools.html")) {
+                document.getElementById("tasksLink").classList.add("active");
+            } else if (url.includes("alignment.html")) {
+                document.getElementById("alignmentLink").classList.add("active");
+            }
+        }); 
+       });
+
+       function run_alignment(event){
+        event.preventDefault();
+        const form_data = new FormData();
+        form_data.append('pdbId', document.getElementById('pdbId').value);
+        form_data.append('pdbId2', document.getElementById('pdbId2').value);
+        form_data.append('go', document.getElementById('go').value);
+        form_data.append('ge', document.getElementById('ge').value);
+        form_data.append('global', document.getElementById('global').checked);
+        form_data.append('local', document.getElementById('local').checked);
+        form_data.append('freeshift', document.getElementById('freeshift').checked);
+        form_data.append('nw', document.getElementById('nw').checked);
+        form_data.append('gt', document.getElementById('gt').checked);
+        form_data.append('mat', document.getElementById('mat').files[0]);
+
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/alignment.py', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+        
+       }
+
+    </script>
+   
+</head>
+<body class='bg-gray-50'>
+
+    <div id="header"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Sequences:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="text" id="pdbId" placeholder="<head1>:<seq>,<head2>:<seq>,db_<head3>,..." class="bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center w-1/2">
+                    <input type="file" id="pdbId_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Pair(s):</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="text" id="pdbId2" placeholder="<head1>:<head2>,<head3>:<head1>" class="bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center w-1/2">
+                    <input type="file" id="pdbId2_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>            
+        </div>
+
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg px-4 py-2">
+            <div class="flex flex-col items-start">
+                <div class="flex flex-row items-center">
+                    <p class="text-xs font-semibold txt-lgt italic ">Penalties:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="nw">Gap open penalty</label>
+                        <input class="w-8 h-5 bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center" type="text" id="go" name="go">
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="nw">Gap extend penalty</label>
+                        <input class="w-8 h-5 bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center" type="text" id="ge" name="ge">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-start">
+                <div class="flex flex-row items-center">
+                    <p class="text-xs font-semibold txt-lgt italic ">Type:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="global">Global</label>
+                        <input class="w-3 h-3" type="checkbox" id="global" name="checkboxGroup">
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="local">Local</label>
+                        <input class="w-3 h-3" type="checkbox" id="local" name="checkboxGroup">  
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="freeshift">Freeshift</label>
+                        <input class="w-3 h-3" type="checkbox" id="freeshift" name="checkboxGroup">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-start">
+                <div class="flex flex-row items-center">
+                    <p class="text-xs font-semibold txt-lgt italic ">Aligorithm:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="nw">Needleman-Wunsch</label>
+                        <input class="w-3 h-3" type="checkbox" id="nw" name="checkboxGroup">
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="gt">Gotoh</label>
+                        <input class="w-3 h-3" type="checkbox" id="gt" name="checkboxGroup">  
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-start">
+                <div class="flex flex-row items-center">
+                    <p class="text-xs font-semibold txt-lgt italic ">Scoring System:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                    <p id="upl" class="text-xs font-normal text-gray-600">Upload Matrix</button>
+                    <input type="file" id="mat" name="scoringMatrix">
+                </div>
+            </div>
+
+
+        </div>
+       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <button id="undo_button" onclick="loadPDB()"><p class="lnk text-lg font-semibold">Undo</p></button>
+            <button id="run_button" onclick="loadPDB()"><p class="lnk text-lg font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">Freitext-Suche nach Sequenzen (Protein, DNA, RNA). Sie erhalten Zugang zu experimentell bestimmten 3D Strukturen des <a href="https://www.rcsb.org/" class="lnk">Protein Data Bank (PDB)</a> Archivs.
+                Diese Daten stellen einen strukturellen Ueberblick ueber die Biologie dar.</p>
+        </div> 
+    </div>
+
+
+</body>
+</html>

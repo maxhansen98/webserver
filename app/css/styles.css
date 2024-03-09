@@ -95,9 +95,13 @@ body div ul li {
 .txt-lgt {
     color: #868b93;
 }
+.txt-lgt-mx {
+    color: #dde1e9;
+}
 .bg-txt {
     background-color: #161e3b;
 }
+
 .bg-txt-lgt-mx {
     background-color: #dde1e9;
 }
