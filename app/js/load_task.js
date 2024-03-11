@@ -8,8 +8,6 @@ const tasks = [
     { id:6, name: "Homstrad", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/homstrad", input:{parameters:[{name:"PDB-ID", id:"pdb", required:true, type: "text", default:'"2cro"'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/homstrad.py", output:{type: "text", format:"alignment" , default:''}},
     { id:7, name: "ORF Finder", repo_url: "https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/orf_finder?ref_type=heads", input:{parameters:[{name:"Genome", id:"fasta", required:true, type: "file", default:'Escherichia_coli.genome.fa'}]}, api_url:"http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/orf.py", output:{type: "text", format:"fasta" , default:''}},
    
-    
-
 ]
 
 function toFasta(unformattedText){

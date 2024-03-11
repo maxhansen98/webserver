@@ -50,6 +50,8 @@
         const form_data = new FormData();
         form_data.append('pdbId', document.getElementById('pdbId').value);
         form_data.append('pdbId2', document.getElementById('pdbId2').value);
+        form_data.append('pdbId_f', document.getElementById('pdbId_f').files[0]);
+        form_data.append('pdbId2_f', document.getElementById('pdbId2_f').files[0]);
         form_data.append('go', document.getElementById('go').value);
         form_data.append('ge', document.getElementById('ge').value);
         form_data.append('global', document.getElementById('global').checked);
@@ -57,7 +59,7 @@
         form_data.append('freeshift', document.getElementById('freeshift').checked);
         form_data.append('nw', document.getElementById('nw').checked);
         form_data.append('gt', document.getElementById('gt').checked);
-        form_data.append('mat', document.getElementById('mat').files[0]);
+        form_data.append('mat_f', document.getElementById('mat_f').files[0]);
 
         fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/alignment.py', {
         method: 'POST',
@@ -65,11 +67,47 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            const output = data['data']['output']
+            show_alignment(output);
         })
         .catch(error => {
             console.error("Error:", error);
         });
+
+        function show_alignment(data){
+
+            const dataList = data.split('>')[1].split('\n');
+
+
+
+            var output = document.getElementById('alignmentOutput');
+            output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+            var outputContainer = document.createElement('div');
+            outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+            const outputHeader = document.createElement('h1');
+            outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+            outputHeader.innerHTML = 'Output:';
+            outputContainer.appendChild(outputHeader);
+            const outputSequenceContainer = document.createElement('div');
+            outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300');
+            const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+            const outputSequenceHeader = document.createElement('h1');
+            outputSequenceHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+            outputSequenceHeader.style = codeFontStyle;
+            outputSequenceHeader.innerHTML = 'Alignment: ' + dataList[0]
+            outputSequenceContainer.appendChild(outputSequenceHeader);
+            for (let i = 1; i < dataList.length; i++) {
+                const outputSequence = document.createElement('p');
+                outputSequence.classList.add('text-xs', 'font-normal', 'txt-lgt');
+                outputSequence.style = codeFontStyle;
+                outputSequence.innerHTML = dataList[i];
+                outputSequenceContainer.appendChild(outputSequence);
+            }
+
+
+            outputContainer.appendChild(outputSequenceContainer);
+            output.appendChild(outputContainer);
+        }
         
        }
 
@@ -145,7 +183,7 @@
 
             <div class="flex flex-col items-start">
                 <div class="flex flex-row items-center">
-                    <p class="text-xs font-semibold txt-lgt italic ">Aligorithm:</p>
+                    <p class="text-xs font-semibold txt-lgt italic ">Algorithm:</p>
                 </div>
                 <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
                     <div class="flex flex-row items-center gap-1">
@@ -166,7 +204,7 @@
                 </div>
                 <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
                     <p id="upl" class="text-xs font-normal text-gray-600">Upload Matrix</button>
-                    <input type="file" id="mat" name="scoringMatrix">
+                    <input type="file" id="mat_f">
                 </div>
             </div>
 
@@ -175,8 +213,8 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <button id="undo_button" onclick="loadPDB()"><p class="lnk text-lg font-semibold">Undo</p></button>
-            <button id="run_button" onclick="loadPDB()"><p class="lnk text-lg font-semibold">Run</p></button>
+            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
+            <button id="run_button" onclick="run_alignment(event)"><p class="lnk text-lg font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
@@ -186,6 +224,7 @@
                 Diese Daten stellen einen strukturellen Ueberblick ueber die Biologie dar.</p>
         </div> 
     </div>
+    <div id="alignmentOutput"></div>
 
 
 </body>

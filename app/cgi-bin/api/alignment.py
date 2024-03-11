@@ -5,13 +5,14 @@ import subprocess
 import re
 import cgi
 import cgitb
+import os
 
 cgitb.enable()
 
 def execute_subprocess(alignment_data):
     
     
-    command = ["java", "-jar", "/home/h/hummelj/propra/alignment_v2/out/artifacts/alignment_jar/alignment.jar"]
+    command = ["java", "-jar", "/mnt/biocluster/praktikum/bioprakt/progprakt-03/Solution3/finaljars/alignment.jar"]
     if alignment_data['go']:
         command.append("--go")
         command.append(alignment_data['go'])
@@ -19,12 +20,7 @@ def execute_subprocess(alignment_data):
         command.append("--ge")
         command.append(alignment_data['ge'])
 
-    mat = alignment_data['mx_content']
-    if mat:
-        with open('temp_mx.mat', 'w') as f:
-            f.write(mat.decode('utf-8'))
-        command.append("-m")
-        command.append('temp_mx.mat')
+    
     command.append("--mode")
     if alignment_data['global_align']:
         command.append("global")
@@ -33,29 +29,43 @@ def execute_subprocess(alignment_data):
     elif alignment_data['freeshift_align']:
         command.append("freeshift")
     command.append("--format")
-    command.append("json")
+    command.append("ali")
     if alignment_data['nw']:
         command.append("--nw")
     if alignment_data['seq_1']:
-        # command.append("--seq_1")
-        print(alignment_data['seq_1'])
+        with open('temp_seq_1.seqlib', 'w') as f:
+            for seq in alignment_data['seq_1'].split(','):
+                i = seq.split(':')
+                f.write(i[0].strip() + ':' + i[1].strip() + '\n')
     elif alignment_data['seq_1_f']:
         with open('temp_seq_1.seqlib', 'w') as f:
             f.write(alignment_data['seq_1_f'].decode('utf-8'))
-        command.append("--seqlib")
-        command.append('temp_seq_1.seqlib')
+    command.append("--seqlib")
+    command.append('temp_seq_1.seqlib')
     
     if alignment_data['seq_2']:
-        # command.append("--seq_2")
-        print(alignment_data['seq_2'])
+        with open('temp_seq_2.seqlib', 'w') as f:
+            for seq in alignment_data['seq_2'].split(','):
+                i = seq.split(':')
+                f.write(i[0].strip() + ' ' + i[1].strip() + '\n')
     elif alignment_data['seq_2_f']:
         with open('temp_seq_2.pairs', 'w') as f:
             f.write(alignment_data['seq_2_f'].decode('utf-8'))
-        command.append("--pairs")
-        command.append('temp_seq_2.pairs')
+    command.append("--pairs")
+    command.append('temp_seq_2.pairs')
+
+    if alignment_data['mat']:
+        with open('temp_mat.mat', 'w') as f:
+            f.write(alignment_data['mat'].decode('utf-8'))
+        command.append("--m")
+        command.append('temp_mat.mat')
+    
+ 
 
 
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    os.remove('temp_seq_1.seqlib')
+    os.remove('temp_seq_2.pairs')
 
     if result.returncode == 0:
         return {
@@ -74,6 +84,11 @@ def main():
     form = cgi.FieldStorage()
     
     try:
+        seq_1 = None
+        seq_2 = None
+        seq_1_f = None  
+        seq_2_f = None
+        mat = None
         if form.getvalue('pdbId'):
             seq_1 = form.getvalue('pdbId')
         elif form.getvalue('pdbId_f'):
@@ -83,16 +98,17 @@ def main():
             seq_2 = form.getvalue('pdbId2')
         elif form.getvalue('pdbId2_f'):
             seq_2_f = form['pdbId2_f'].file.read()
+        if form.getvalue('mat_f'):
+            mat = form['mat_f'].file.read()
 
         go = form.getvalue('go')
         ge = form.getvalue('ge')
-        global_align = form.getvalue('global') == 'on'
-        local_align = form.getvalue('local') == 'on'
-        freeshift_align = form.getvalue('freeshift') == 'on'
-        nw = form.getvalue('nw') == 'on'
-        gt = form.getvalue('gt') == 'on'
-        mx_file = form['mat'].file
-        mx_content = mx_file.read()
+        global_align = form.getvalue('global')
+        local_align = form.getvalue('local')
+        freeshift_align = form.getvalue('freeshift')
+        nw = form.getvalue('nw')
+        gt = form.getvalue('gt')
+
     
         alignment_data = {
         'seq_1': seq_1,
@@ -106,10 +122,11 @@ def main():
         'freeshift_align': freeshift_align,
         'nw': nw,
         'gt': gt,
-        'scoring_matrix': mx_content 
+        'mat': mat 
         }
 
         result = {'data': execute_subprocess(alignment_data)}
+        #result = {'data': {'global': form.getvalue('global'), 'local': form.getvalue('local'), 'freeshift': form.getvalue('freeshift')}}
     except Exception as e:
         result = {'error': str(e)}
 
