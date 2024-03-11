@@ -228,7 +228,52 @@
     </div>
     <div id="alignmentOutput"></div>
     <div id="validationPlots" class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div>
+            <h2 class="text-lg font-semibold txt-lgt">Validation Plots</h2>
+            <p class="text-xs font-normal txt-lgt"> Two files vali.pairs and vali.seqlib are created with python script extract_homstrad.py from HOMSTRAD folder containing all superfamilies with corresponding alignments. vali.seqlib contains all sequences found in the HOMSTRAD folder. vali.pairs contains pairs of sequences of a shared superfamily to be aligned (all permutations if superfamily consists of >2 sequences).
+                vali.seqlib contains 3459 sequences from all HOMSTRAD superfamilies.
+                vali.pairs contains 9541 pairs of sequences to be aligned.
 
+                alignment.jar creates algorithm_mode_matrix.test file from vali.pairs and vali.seclib. algorithm_mode_matrix.test contains entries with a header starting with ">" and followed by 4 lines. Line 1 and 2 correspond to the predicted alignment, line 3 and 4 correspond to the reference alignment, i.e. the HOMSTRAD alignment.
+
+                validateAli.jar takes the output of alignment.jar, which is the testset_validation.test file, as input and calculates sensitivity, specificity, mean shift error, inversed mean shift error and coverage (and also identity) comparing the predicted alignment with the reference alignment. statistics are added to the header line, separated by whitespace. </p>
+        </div>
+        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/sensitivity_box_plot.png" alt="Sensitivity Box Plot">
+                <p class="text-xs font-semibold txt-lgt italic">Sensitivity Box Plot:</p>
+                <p class="text-xs font-normal txt-lgt">Sensitivity values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+            </div>
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/specificity_box_plot.png" alt="Specificity Box Plot">
+                <p class="text-xs font-semibold txt-lgt italic">Specificity Box Plot:</p>
+                <p class="text-xs font-normal txt-lgt">Specificity values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+            </div>
+        </div>
+        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/mse_box_plot.png" alt="MSE Box Plot">
+                <p class="text-xs font-semibold txt-lgt italic">MSE Box Plot:</p>
+                <p class="text-xs font-normal txt-lgt">MSE values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+            </div>
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/imse_box_plot.png" alt="IMSE Box Plot">
+                <p class="text-xs font-semibold txt-lgt italic">IMSE Box Plot:</p>
+                <p class="text-xs font-normal txt-lgt">IMSE values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+            </div>
+        </div>
+        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/coverage_box_plot.png" alt="Coverage Box Plot">
+                <p class="text-xs font-semibold txt-lgt italic">Coverage Box Plot:</p>
+                <p class="text-xs font-normal txt-lgt">Coverage values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+            </div>
+        </div>
+        <div>
+            <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/sensitivity_violin_plot.png" alt="Sensitivity Violin Plot">
+            <p class="text-xs font-semibold txt-lgt italic">Sensitivity Violin Plot:</p>
+            <p class="text-xs font-normal txt-lgt">Sensitivity values for different parameter combinations tested on HOMSTRAD derived testset.</p>
+        </div>
     </div>
     
 

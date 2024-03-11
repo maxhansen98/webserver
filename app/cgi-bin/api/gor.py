@@ -13,6 +13,41 @@ def clean_json(data):
 
 def execute_train_subprocess(train_gor_data):
     command = ["java", "-jar", "/home/h/hummelj/propra/gor/train.jar"]
+    if train_gor_data['train_f']:
+        with open('temp_train.fasta', 'w') as f:
+            f.write(train_gor_data['train_f'].decode('utf-8'))
+        train = 'temp_train.fasta'
+    else:
+        train = '/home/h/hummelj/propra/gor/training/train_1.txt'
+    command.append("--db")
+    command.append(train)
+    
+    if train_gor_data['gor_1']:
+        version = "gor1"
+    elif train_gor_data['gor_3']:
+        version = "gor3"
+    elif train_gor_data['gor_4']:
+        version = "gor4"
+    command.append("--method")
+    command.append(version)
+    
+    command.append("--model")
+    command.append('temp_mod.mod')
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    if train_gor_data['train_f']:
+        os.remove('temp_train.fasta')
+
+    if result.returncode == 0:
+        return {
+            'success': True,
+            'output': result.stdout
+        }
+    else:
+        return {
+            'success': False,
+            'error': result.stderr
+        }
+    
 
 
 def execute_prediction_subprocess(gor_data):
@@ -74,9 +109,14 @@ def main():
             if not default_data:
                 train_f = form['train_f'].file.read()
             else:
-                train_gor_data = None
-            result = {'error': 'Training mode not implemented yet'}
-        #result = {'data': {'mode': mode}}
+                train_f = None
+            gor_data = {
+                'train_f': train_f,
+                'gor_1': form.getvalue('gor_1'),
+                'gor_3': form.getvalue('gor_3'),
+                'gor_4': form.getvalue('gor_4'),
+            }
+            result = {'data': execute_train_subprocess(gor_data)}
     except Exception as e:
         result = {'error': str(e)}
 

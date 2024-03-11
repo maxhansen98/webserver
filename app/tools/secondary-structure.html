@@ -113,6 +113,32 @@
         
        }
 
+       function train_gor(event) {
+        event.preventDefault();
+        const form_data = new FormData();
+        if (document.getElementById('train_f').files.length != 0){
+            form_data.append('train_f', document.getElementById('train_f').files[0]);
+        }
+        form_data.append('default_data', document.getElementById('default_data').checked);
+        form_data.append('gor_1', document.getElementById('gor_1').checked);
+        form_data.append('gor_3', document.getElementById('gor_3').checked);
+        form_data.append('gor_4', document.getElementById('gor_4').checked);
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=train', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            //const output = data['data']['output']
+            //show_sec_struct(to_json(output));
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+
+       }
+
     </script>
    
 </head>
@@ -160,7 +186,7 @@
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
             <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
-            <button id="run_button" onclick="run_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+            <button id="run_button" onclick="train_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
