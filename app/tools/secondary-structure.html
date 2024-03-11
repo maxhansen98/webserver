@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
+	<script type="text/javascript">
+	var Info = {
+	  width: 500,
+	  height: 500,
+	  j2sPath: "jsmol/j2s",
+	}
+	function loadPDB() {
+            var pdbId = document.getElementById("pdbId").value;
+            var pdbUrl = "https://files.rcsb.org/download/" + pdbId + ".pdb";
+
+            // Load PDB file using JSmol
+            Jmol.script(jmolApplet0, "background black; load " + pdbUrl + "; cartoon only; spin on; color structure;");
+        }
+	</script>
+
+    <title>GOR | 3er Block</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css"> <!-- Reference to your external CSS file -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/static_data.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="../public/lmu.png">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+    </script>
+    <script> 
+       $(function(){
+        $("#header").load("../header.html", function() {
+            // This code runs after the header content has been loaded
+            var url = window.location.href;
+            if (url.includes("secondary-structure.html")) {
+                document.getElementById("secPred").classList.add("active");
+            }
+        }); 
+       });
+
+       function run_gor(event){
+        event.preventDefault();
+        const form_data = new FormData();
+        form_data.append('default_model', document.getElementById('default_model').checked);
+        if (document.getElementById('mod_f').files.length != 0){
+            form_data.append('mod_f', document.getElementById('mod_f').files[0]);
+        }
+        form_data.append('pred_f', document.getElementById('pred_f').files[0]); 
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=predict', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+            const output = data['data']['output']
+            show_sec_struct(to_json(output));
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+
+
+        function to_json(data){
+            var json = {};
+            var data = data.split('>');
+            for (let i = 1; i < data.length; i++) {
+                var sequence = data[i].split('\n');
+                const id = sequence[0].trim();
+                let pred = {};
+                for (let j = 1; j < sequence.length-1; j++) {
+                    const bin = sequence[j].split(' ');
+                    pred[bin[0]] = bin[1];
+                }
+                json[id] = pred;
+
+            }
+            return json;
+        }
+
+        function show_sec_struct(data){
+            var output = document.getElementById('predictionOutput');
+            output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+            var outputContainer = document.createElement('div');
+            outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+            const outputHeader = document.createElement('h1');
+            outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+            outputHeader.innerHTML = 'Output:';
+            outputContainer.appendChild(outputHeader);
+            const outputSequenceContainer = document.createElement('div');
+            outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300', 'overflow-scroll', 'max-h-80');
+            const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+            for (const [key, value] of Object.entries(data)) {
+                const outputSequenceHeader = document.createElement('h1');
+                outputSequenceHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+                outputSequenceHeader.style = codeFontStyle;
+                outputSequenceHeader.innerHTML = 'Secondary structure predicted for ' + key
+                outputSequenceContainer.appendChild(outputSequenceHeader);
+                for (const [k, v] of Object.entries(value)) {
+                    const outputSequence = document.createElement('p');
+                    outputSequence.classList.add('text-xs', 'font-normal', 'txt-lgt');
+                    outputSequence.style = codeFontStyle;
+                    outputSequence.innerHTML = k + ' ' + v;
+                    outputSequenceContainer.appendChild(outputSequence);
+                }
+            }
+            outputContainer.appendChild(outputSequenceContainer);
+            output.appendChild(outputContainer);
+        }
+        
+       }
+
+    </script>
+   
+</head>
+<body class='bg-gray-50'>
+
+    <div id="header"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Training data:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <label class="text-xs font-normal text-gray-600" for="default_data">Use default data</label>
+                    <input type="checkbox" id="default_data" class="w-3 h-3">
+                    <input type="file" id="train_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Version:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="gor_1">GOR 1</label>
+                        <input class="w-3 h-3" type="checkbox" id="gor_1" name="gorGroup">
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="gor_3">GOR 3</label>
+                        <input class="w-3 h-3" type="checkbox" id="gor_3" name="gorGroup">  
+                    </div>
+                    
+                    <div class="flex flex-row items-center gap-1">
+                        <label class="text-xs font-normal text-gray-600" for="gor_4">GOR 4</label>
+                        <input class="w-3 h-3" type="checkbox" id="gor_4" name="gorGroup">
+                    </div>
+                </div>
+            </div>            
+        </div>
+
+       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
+            <button id="run_button" onclick="run_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">Die Sekundaerstruktur eines Proteins laesst sich auf der Grundlage seiner Aminosaeuresequenz mit hoher Genauigkeit vorhersagen, was wertvolle Einblicke in seine Faltung und Funktion ermoeglicht.</p>
+        </div> 
+    </div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Pretrained model:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <label class="text-xs font-normal text-gray-600" for="default_model">Use default model</label>
+                    <input type="checkbox" id="default_model" class="w-3 h-3">
+                    <input type="file" id="mod_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Input sequences:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="file" id="pred_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>            
+        </div>
+
+       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
+            <button id="run_button" onclick="run_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">Die Sekundaerstruktur eines Proteins laesst sich auf der Grundlage seiner Aminosaeuresequenz mit hoher Genauigkeit vorhersagen, was wertvolle Einblicke in seine Faltung und Funktion ermoeglicht.</p>
+        </div> 
+    </div>
+    <div id="predictionOutput"></div>
+
+
+</body>
+</html>

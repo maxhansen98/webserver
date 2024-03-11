@@ -44,7 +44,7 @@ def execute_subprocess(alignment_data):
     command.append('temp_seq_1.seqlib')
     
     if alignment_data['seq_2']:
-        with open('temp_seq_2.seqlib', 'w') as f:
+        with open('temp_seq_2.pairs', 'w') as f:
             for seq in alignment_data['seq_2'].split(','):
                 i = seq.split(':')
                 f.write(i[0].strip() + ' ' + i[1].strip() + '\n')
@@ -126,7 +126,7 @@ def main():
         }
 
         result = {'data': execute_subprocess(alignment_data)}
-        #result = {'data': {'global': form.getvalue('global'), 'local': form.getvalue('local'), 'freeshift': form.getvalue('freeshift')}}
+        #result = {'data': {'global': form.getvalue('pdbId'), 'local': form.getvalue('pdbId2')}}
     except Exception as e:
         result = {'error': str(e)}
 

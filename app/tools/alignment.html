@@ -35,11 +35,7 @@
         $("#header").load("../header.html", function() {
             // This code runs after the header content has been loaded
             var url = window.location.href;
-            if (url.includes("index.html")) {
-                document.getElementById("teamLink").classList.add("active");
-            } else if (url.includes("tools.html")) {
-                document.getElementById("tasksLink").classList.add("active");
-            } else if (url.includes("alignment.html")) {
+            if (url.includes("alignment.html")) {
                 document.getElementById("alignmentLink").classList.add("active");
             }
         }); 
@@ -50,8 +46,14 @@
         const form_data = new FormData();
         form_data.append('pdbId', document.getElementById('pdbId').value);
         form_data.append('pdbId2', document.getElementById('pdbId2').value);
-        form_data.append('pdbId_f', document.getElementById('pdbId_f').files[0]);
-        form_data.append('pdbId2_f', document.getElementById('pdbId2_f').files[0]);
+        if (document.getElementById('pdbId_f').files.length != 0){
+            form_data.append('pdbId_f', document.getElementById('pdbId_f').files[0]);
+        }
+        if (document.getElementById('pdbId2_f').files.length != 0){
+            form_data.append('pdbId2_f', document.getElementById('pdbId2_f').files[0]);
+        }
+        
+        
         form_data.append('go', document.getElementById('go').value);
         form_data.append('ge', document.getElementById('ge').value);
         form_data.append('global', document.getElementById('global').checked);
@@ -67,6 +69,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            //console.log(data);
             const output = data['data']['output']
             show_alignment(output);
         })
@@ -144,7 +147,7 @@
         <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg px-4 py-2">
             <div class="flex flex-col items-start">
                 <div class="flex flex-row items-center">
-                    <p class="text-xs font-semibold txt-lgt italic ">Penalties:</p>
+                    <p class="text-xs font-semibold txt-lgt italic ">Penalties (optional):</p>
                 </div>
                 <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
                     <div class="flex flex-row items-center gap-1">
@@ -220,11 +223,14 @@
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
            
         <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
-            <p class="text-xs font-normal txt-lgt">Freitext-Suche nach Sequenzen (Protein, DNA, RNA). Sie erhalten Zugang zu experimentell bestimmten 3D Strukturen des <a href="https://www.rcsb.org/" class="lnk">Protein Data Bank (PDB)</a> Archivs.
-                Diese Daten stellen einen strukturellen Ueberblick ueber die Biologie dar.</p>
+            <p class="text-xs font-normal txt-lgt">Mit dem Alignment Tool werden Gemeinsamkeiten zwischen biologischen Sequenzen gesucht. Dabei werden Nukleotid- oder Proteinsequenzen mit Sequenzdatenbanken verglichen.</p>
         </div> 
     </div>
     <div id="alignmentOutput"></div>
+    <div id="validationPlots" class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+
+    </div>
+    
 
 
 </body>
