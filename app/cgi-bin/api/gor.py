@@ -6,6 +6,8 @@ import re
 import cgi
 import cgitb
 import os
+import datetime 
+
 
 cgitb.enable()
 def clean_json(data):
@@ -31,22 +33,23 @@ def execute_train_subprocess(train_gor_data):
     command.append("--method")
     command.append(version)
     
+    
+    dt = datetime.datetime.now()
+    seq = int(dt.strftime("%Y%m%d%H%M%S"))
+    outpath = f'{seq}-{version}.mod'
     command.append("--model")
-    command.append('temp_mod.mod')
-    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    command.append(outpath)
+    subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+  
     if train_gor_data['train_f']:
         os.remove('temp_train.fasta')
 
-    if result.returncode == 0:
-        return {
-            'success': True,
-            'output': result.stdout
-        }
-    else:
-        return {
-            'success': False,
-            'error': result.stderr
-        }
+    outpath = f'../cgi-bin/api/{outpath}'
+    return {
+        'success': True,
+        'output': outpath
+    }
+    
     
 
 
@@ -117,6 +120,14 @@ def main():
                 'gor_4': form.getvalue('gor_4'),
             }
             result = {'data': execute_train_subprocess(gor_data)}
+        elif mode == 'clean':
+            mod_name = form.getvalue('mod_name')
+            if mod_name:
+                mod_name = mod_name.split('/')[-1].strip()
+                os.remove(f'{mod_name}')
+                result = {'cleaned up'}
+            else:
+                result = {'error': 'No mod_name provided'}
     except Exception as e:
         result = {'error': str(e)}
 

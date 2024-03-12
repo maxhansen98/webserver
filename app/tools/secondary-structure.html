@@ -43,6 +43,10 @@
 
        function run_gor(event){
         event.preventDefault();
+        let run = document.getElementById('run_button_p')
+        let loading = document.getElementById('loading_p')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
         const form_data = new FormData();
         form_data.append('default_model', document.getElementById('default_model').checked);
         if (document.getElementById('mod_f').files.length != 0){
@@ -58,9 +62,15 @@
             //console.log(data);
             const output = data['data']['output']
             show_sec_struct(to_json(output));
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
         })
         .catch(error => {
             console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
         });
 
 
@@ -115,6 +125,10 @@
 
        function train_gor(event) {
         event.preventDefault();
+        let run = document.getElementById('run_button_t')
+        let loading = document.getElementById('loading_t')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
         const form_data = new FormData();
         if (document.getElementById('train_f').files.length != 0){
             form_data.append('train_f', document.getElementById('train_f').files[0]);
@@ -129,14 +143,55 @@
         })
         .then(response => response.json())
         .then(data => {
+            const output = data['data']['output']
+            show_model_link(output);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
+        });
+
+       }
+
+       function show_model_link(data){
+        var output = document.getElementById('trainOutput');
+        output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+        var outputContainer = document.createElement('div');
+        outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+        const outputHeader = document.createElement('h1');
+        outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+        outputHeader.innerHTML = 'Output:';
+        outputContainer.appendChild(outputHeader);
+        const outputSequenceContainer = document.createElement('div');
+        outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300');
+        const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+        const outputSequence = document.createElement('a');
+        outputSequence.classList.add('text-xs', 'font-normal', 'lnk');
+        outputSequence.innerHTML = 'Download model';
+        outputSequence.href = data;
+        outputSequence.setAttribute('download', '');
+        outputContainer.appendChild(outputSequence);
+        output.appendChild(outputContainer);
+       }
+
+       function clean(event, mode){
+        event.preventDefault();
+        const form_data = new FormData();
+        form_data.append('mod_name', mode);
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=clean', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
             console.log(data);
-            //const output = data['data']['output']
-            //show_sec_struct(to_json(output));
         })
         .catch(error => {
             console.error("Error:", error);
         });
-
        }
 
     </script>
@@ -185,8 +240,8 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
-            <button id="run_button" onclick="train_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+            <p id="loading_t" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_button_t" onclick="train_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
@@ -195,6 +250,7 @@
             <p class="text-xs font-normal txt-lgt">Die Sekundaerstruktur eines Proteins laesst sich auf der Grundlage seiner Aminosaeuresequenz mit hoher Genauigkeit vorhersagen, was wertvolle Einblicke in seine Faltung und Funktion ermoeglicht.</p>
         </div> 
     </div>
+    <div id="trainOutput"></div>
 
     <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
         <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
@@ -222,8 +278,8 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
-            <button id="run_button" onclick="run_gor(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+            <p id="loading_p" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_button_p" onclick="run_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
