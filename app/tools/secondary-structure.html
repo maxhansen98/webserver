@@ -73,6 +73,9 @@
             loading.style.display = 'none';
         });
 
+        
+
+
 
         function to_json(data){
             var json = {};
@@ -93,6 +96,9 @@
 
         function show_sec_struct(data){
             var output = document.getElementById('predictionOutput');
+            if (output.hasChildNodes()) {
+                    output.innerHTML = '';
+                }
             output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
             var outputContainer = document.createElement('div');
             outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
@@ -158,6 +164,9 @@
 
        function show_model_link(data){
         var output = document.getElementById('trainOutput');
+        if (output.hasChildNodes()) {
+                    output.innerHTML = '';
+                }
         output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
         var outputContainer = document.createElement('div');
         outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
@@ -194,6 +203,101 @@
         });
        }
 
+       function hideInfo(id, bt){
+            var info = document.getElementById(id);
+            var button = document.getElementById(bt);
+            if (info.classList.contains('hidden')) {
+                info.classList.remove('hidden');
+                button.innerHTML = 'Hide';
+            } else {
+                info.classList.add('hidden');
+                button.innerHTML = 'Show';
+            }
+        }
+
+        function run_vali(event){
+        event.preventDefault();
+        let run = document.getElementById('run_button_v')
+        let loading = document.getElementById('loading_v')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
+        const form_data = new FormData();
+        form_data.append('pred_v', document.getElementById('val_pred_f').files[0]);
+        form_data.append('ref_v', document.getElementById('val_ref_f').files[0]);
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=validate', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+            const output = data['data']['output']
+            show_download_link(output, 'validationOutput');
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
+        });
+    }
+
+    function show_download_link(data, tag){
+        var output = document.getElementById(tag);
+        if (output.hasChildNodes()) {
+                    output.innerHTML = '';
+                }
+        output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+        var outputContainer = document.createElement('div');
+        outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+        const outputHeader = document.createElement('h1');
+        outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+        outputHeader.innerHTML = 'Output:';
+        outputContainer.appendChild(outputHeader);
+        const outputSequenceContainer = document.createElement('div');
+        outputSequenceContainer.classList.add('w-full', 'flex', 'flex-row', 'items-center', 'justify-start', 'rounded-lg', 'gap-4');
+        const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+        for (const [key, value] of Object.entries(data)) {
+            const outputSequence = document.createElement('a');
+            outputSequence.classList.add('text-xs', 'font-normal', 'lnk');
+            outputSequence.innerHTML = 'Download ' + key;
+            outputSequence.href = value;
+            outputSequence.setAttribute('download', '');
+            outputSequenceContainer.appendChild(outputSequence);
+        }
+        outputContainer.appendChild(outputSequenceContainer);
+        output.appendChild(outputContainer);
+    }
+
+    function run_ana(event){
+        event.preventDefault();
+        let run = document.getElementById('run_button_a')
+        let loading = document.getElementById('loading_a')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
+        const form_data = new FormData();
+        form_data.append('ref_a', document.getElementById('val_ref_a').files[0]);
+        form_data.append('th_a', document.getElementById('th_a').value);
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=analyze', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+            const output = data['data']['output']
+            show_download_link(output, 'anaOutput');
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
+        });
+    }
+
     </script>
    
 </head>
@@ -209,7 +313,7 @@
                     <p class="text-xs font-semibold txt-lgt italic ">Training data:</p>
                 </div>
                 <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
-                    <label class="text-xs font-normal text-gray-600" for="default_data">Use default data</label>
+                    <label class="text-xs font-normal text-gray-600" for="default_data">Use CB513</label>
                     <input type="checkbox" id="default_data" class="w-3 h-3">
                     <input type="file" id="train_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
                 </div>
@@ -240,14 +344,17 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_t" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_t" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
             <button id="run_button_t" onclick="train_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
            
         <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
-            <p class="text-xs font-normal txt-lgt">Die Sekundaerstruktur eines Proteins laesst sich auf der Grundlage seiner Aminosaeuresequenz mit hoher Genauigkeit vorhersagen, was wertvolle Einblicke in seine Faltung und Funktion ermoeglicht.</p>
+            <p class="text-xs font-normal txt-lgt">&#129516; Upload your Training Data and select your desired GOR-algorithm to create and download your model-file. To prevent overfitting, stay sure to use independant data. You can train either on CB513 or 723K by default. Validations and informations about those default databases are provided below.</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: Training Data, Seclib File with Secondary Structures.</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Model file for the selected GOR.</p>
         </div> 
     </div>
     <div id="trainOutput"></div>
@@ -260,7 +367,7 @@
                     <p class="text-xs font-semibold txt-lgt italic ">Pretrained model:</p>
                 </div>
                 <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
-                    <label class="text-xs font-normal text-gray-600" for="default_model">Use default model</label>
+                    <label class="text-xs font-normal text-gray-600" for="default_model">Use CB513 GOR1 Model</label>
                     <input type="checkbox" id="default_model" class="w-3 h-3">
                     <input type="file" id="mod_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
                 </div>
@@ -278,17 +385,362 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_p" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_p" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
             <button id="run_button_p" onclick="run_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
            
         <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
-            <p class="text-xs font-normal txt-lgt">Die Sekundaerstruktur eines Proteins laesst sich auf der Grundlage seiner Aminosaeuresequenz mit hoher Genauigkeit vorhersagen, was wertvolle Einblicke in seine Faltung und Funktion ermoeglicht.</p>
+            <p class="text-xs font-normal txt-lgt">&#128187; Upload your pretrained Model-file. GOR will automatically detect the trained GOR and execute the correct algorithm to create the predictions.</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: Model file for your pretrained GOR and the Input Sequence to predict on (FASTA or Alignments).</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Predictions (.prd) for your given Sequences / Alignments.</p>
         </div> 
     </div>
     <div id="predictionOutput"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Predictions:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="file" id="val_pred_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">References:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="file" id="val_ref_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>            
+        </div>
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <p id="loading_v" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_button_v" onclick="run_vali(event)"><p class="lnk text-xs font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">&#128202; For a given input .prd file of a GOR model (GOR I, GOR III, GOR IV and GOR V), calculates the Q3 score 
+                and the SOV score for each prediction and writes two summary files with the scores. One containing a overall summary of the scores and one containing the scores for each sequence.</p>
+                <br>
+                <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: A .prd file with the predictions of a GOR model.</p>
+                <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Two .txt files with the Q3 and SOV scores for each sequence and a summary of the scores.</p>
+        </div> 
+    </div>
+    <div id="validationOutput"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">References:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="file" id="val_ref_a" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                    <label class="text-xs font-normal text-gray-600" for="th_a">Threshold</label>
+                    <input class="w-8 h-5 bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center" type="text" id="th_a" name="th_a">
+                </div>
+            </div>            
+        </div>
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <p id="loading_a" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_button_a" onclick="run_ana(event)"><p class="lnk text-xs font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">&#128207; For a given input .db file, calculates the pairwise ncd for each sequence and filter out the ones that are below a given threshold. This way we can filter out the sequences that are too similar to each other. The script will output two plots and a .db file with the filtered sequences. The first plot is a heatmap of the ncd values before filtering, and the second plot is a heatmap of the ncd values after filtering.</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: A .db file with the sequences and secondary structures and a threshold value.</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: A .db file with the filtered sequences and two plots. One plot showing the pairwise ncd values before filtering and one plot showing the pairwise ncd values after filtering.</p>
+        </div> 
+    </div>
+    <div id="anaOutput"></div>
+
+    <style>
+        /* Füge diesen CSS-Stil hinzu oder aktualisiere ihn */
+        .plot {
+            width: 50%;
+            float: left;
+            box-sizing: border-box; /* Berücksichtige Padding und Border in der Breite */
+            padding: 10px; /* Füge etwas Abstand um die Bilder hinzu */
+            text-align: center; /* Mittig ausrichten */
+        }
+        #gorPlots.hidden {
+        display: none;
+        }
+    </style>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">GOR Informations</h2>
+            <button onclick="hideInfo('gor_info', 'l1')"><p id="l1" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="gor_info", class="hidden">
+            <title>GOR Informations</title>
+            <header>
+                <h1><b>GOR General</b></h1>
+                <div>
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/642007/" style="color: blue; text-decoration: underline;">GOR (Garnier J, Osguthorpe DJ, Robson; 1987, J Mol Biol 1978 Mar 25;120(1):97-120)</a> stands for a series of algorithms that are used to predict the secondary structure of proteins. They are based on Naive Bayes and thus learn from secondary counts on reference proteins. 
+                    All GORs look locally in a searchwindow at nearby amino acids and use these to decide the secondary structure at the respective positions. GOR is used to to predict alpha-helicies (H), beta-sheets (E) and coils (C).
+                </div>
+                <br>
+                <h1>
+                    <b>GOR I</b>
+                </h1>
+                <div>
+                    GOR I models contain the SearchWindow length (17 by default) times the number of standard amino acids (20) times the number of secondary structure types (3) entries (340 entries by default). The Searchwindow then goes over the sequence and predicts the respective structure for the center of the window using the highest probability in the window.
+                </div>
+                <div>
+                        <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/gor1-1.webp" alt="">
+                </div>
+                <br>
+                <h1>
+                    <b>GOR III</b>
+                </h1>
+                <div>
+                    GOR III extends GOR I in that the positions in the window are also differentiated in pairs. 
+                    This results in 20,400 parameters by default. (20*20*3*17)
+                </div>
+                <div>
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/gor3.webp" alt="">
+                </div>
+                <br>
+                <h1>
+                    <b>GOR IV</b>
+                </h1>
+                <div>
+                    GOR IV uses all possible pairs within a window and adds them up. In other words, it is first iterated outside and then inside the window. However, with 6.936.000 parameters (3*20*20*17*20*17), this algorithm is also significantly more complex.
+                </div>
+                <div>
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/gor4-1.webp" alt="">
+                </div>
+                <br>
+                <h1><b>GOR V</b>
+                </h1>
+                <div>
+                    GOR V is in turn an extension of GOR I / III / IV and applies the respective algorithm with the inclusion of multiple sequence alignments. GOR V ignores the gaps in the alignments and sums up the probabilitie of one position in the search window the consecutive position in the alignments.
+                </div>
+                <br>
+                <h1><b>Modern Methods for Secondary Structure Prediction</b></h1>
+                <div>
+                    There are now more modern and reliable methods for determining the secondary structure (and tertiary structure) of proteins.
+                    One on deep learning based example would be AlphaFold. Another free to use tool is PSIPRED. To compare the results in Crossvalidation, we provide the following plot:
+                </div>
+                <br>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/PSIPRED_SUMMARY_plot.webp" alt="">
+                </div>
+            </header>
+            <style>
+            </style>
+        </div>
+    </div>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Crossvalidation</h2>
+            <button onclick="hideInfo('gorPlots','l2' )"><p id="l2" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="gorPlots", class="hidden">
+            <title>CB513</title>
+            <header>
+                <h1><b>CB513 vs 723K</b></h1>
+            </header>
+            
+            <div id="gorPlots">
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR1_CB513_cv_ggplot.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR1_723K_cv_ggplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR3_CB513_cv_ggplot.png" alt="CB513, GOR4, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR3_723K_cv_ggplot.png" alt="CB513, GOR5-1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR4_CB513_cv_ggplot.png" alt="CB513, GOR5-3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public//GOR4_723K_cv_ggplot.png" alt="CB513, GOR5-4, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_1_CB513_cv_ggplot.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_1_723K_cv_ggplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_3_CB513_cv_ggplot.png" alt="CB513, GOR4, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_3_723K_cv_ggplot.png" alt="CB513, GOR5-1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_4_CB513_cv_ggplot.png" alt="CB513, GOR5-3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/GOR5_4_723K_cv_ggplot.png" alt="CB513, GOR5-4, CV">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Dataset Analysis</h2>
+            <button onclick="hideInfo('data_analysis', 'l3')"><p id="l3" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="data_analysis", class="hidden">
+            <title>CB513</title>
+            <header>
+                <h1><b>CB513 vs 723K</b></h1>
+            </header>
+            <style>
+            </style>
+            <div id="data_analysis">
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/cb513_occs.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/filtered_seqs_ss_ocs.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/hm_cb513.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/hm_seclib_7k.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/hm_cb513_filtered.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/hm_seclib_7k_filtered.png" alt="CB513, GOR3, CV">
+                </div>
+                <div>
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/ncd.webp" alt="CB513, GOR3, CV">
+                </div>
+                <header>
+                    <h2>
+                        <b>Sources to gzip and normalized compression distance:</b>
+                    </h2>
+                </header>
+                <a href="http://labmaster.mi.infn.it/wwwasdoc.web.cern.ch/wwwasdoc/TL8/texmf/doc/gzip/gzip.pdf" style="color: blue; text-decoration: underline;"><div Gailly,="" 1993=""></div>[Gailly, 1993] gzip</a>
+                <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-017-1319-7" style="color: blue; text-decoration: underline;"><div Zielezinski et al.,="" 2017=""></div>[Zielezinski et al., 2017] Alignment-free sequence comparison: Benefits, applications, and tools. DOI 10.1186/s13059-017-1319-7</a>
+            </div>
+        </div>
+    </div>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Performance</h2>
+            <button onclick="hideInfo('Performance', 'l4')"><p id="l4" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="Performance", class="hidden">
+            <title>CB513</title>
+            <header>
+                <h1><b>Training model: 723K; Used on CB513</b></h1>
+            </header>
+            <style>
+            </style>
+            <div id="Performance">
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor1_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor3_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor4_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor5_1_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor5_3_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723KtoCB513_gor5_4_boxplot.png" alt="CB513, GOR3, CV">
+                </div>
+                <br>
+                <b>First impression?</b>
+                <div class="video-container">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/xVWeRnStdSA" frameborder="0" allowfullscreen></iframe>
+                </div>                  
+
+            </div>
+        </div>
+    </div>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Parameter Tuning: Windowsize </h2>
+            <button onclick="hideInfo('paramTuning', 'l5')"><p id="l5"class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="paramTuning", class="hidden">
+            <title>CB513</title>
+            <header>
+            </header>
+            <style>
+            </style>
+            <div id="paramTuning">
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/Q3_mean.webp" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/SOV_mean.webp" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/SOV_H_mean.webp" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/SOV_E_mean.webp" alt="CB513, GOR3, CV">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Postprocessing and possible pitfalls</h2>
+            <button onclick="hideInfo('postprocessing', 'l6')"><p id="l6" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="postprocessing", class="hidden">
+            <title>CB513</title>
+            <header>
+                <h1><b></b></h1>
+            </header>
+            <style>
+            </style>
+            <div id="postprocessing">
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/Q3_post_proc.webp" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/SOV_post_proc.webp" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/8C5R_distance_plot.png" alt="CB513, GOR3, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/256b_distance_plot.png" alt="CB513, GOR3, CV">
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </body>

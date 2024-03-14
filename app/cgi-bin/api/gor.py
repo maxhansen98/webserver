@@ -24,11 +24,11 @@ def execute_train_subprocess(train_gor_data):
     command.append("--db")
     command.append(train)
     
-    if train_gor_data['gor_1']:
+    if train_gor_data['gor_1'] == "true":
         version = "gor1"
-    elif train_gor_data['gor_3']:
+    elif train_gor_data['gor_3'] == "true":
         version = "gor3"
-    elif train_gor_data['gor_4']:
+    elif train_gor_data['gor_4'] == "true":
         version = "gor4"
     command.append("--method")
     command.append(version)
@@ -88,6 +88,78 @@ def execute_prediction_subprocess(gor_data):
             'error': result.stderr
         }
 
+def execute_validation_subprocess(val_data):
+    command = ["java", "-jar", "/home/h/hummelj/propra/gor/evalGor.jar"]
+
+    
+    with open('temp_ref.db', 'w') as f:
+        f.write(val_data['ref_v'].decode('utf-8'))
+
+    command.append("-r")
+    command.append('temp_ref.db')
+
+    with open('temp_pred.prd', 'w') as f:
+        f.write(val_data['pred_v'].decode('utf-8'))
+
+    command.append("-p")
+    command.append('temp_pred.prd')	
+    dt = datetime.datetime.now()
+    seq = int(dt.strftime("%Y%m%d%H%M%S"))
+    sum_outpath = f'{seq}-gor-summary.txt'
+    command.append("-s")
+    command.append(f'{sum_outpath}')
+    dt_sum_outpath = f'{seq}-gor-detailed-summary.txt'
+    command.append("-d")
+    command.append(f'{dt_sum_outpath}')
+    command.append("-f")
+    command.append("txt")
+    subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)  
+    os.remove('temp_pred.prd')
+    os.remove('temp_ref.db')
+    sum_outpath = f'../cgi-bin/api/{sum_outpath}'
+    dt_sum_outpath = f'../cgi-bin/api/{dt_sum_outpath}'
+
+    return {
+            'success': True,
+            'output': {'summary': sum_outpath, 'detailed summary': dt_sum_outpath}
+        }
+
+def execute_analytics_subprocess(ana_data):
+    command = ["python3","/home/h/hummelj/propra/gor/similarity/sequenceSimilarity.py"]
+    with open('temp_ana_ref.db', 'w') as f:
+        f.write(ana_data['ref_a'].decode('utf-8'))
+    command.append("-d")
+    command.append('temp_ana_ref.db')
+    command.append("-t")
+    command.append(ana_data['threshold'])
+
+    dt = datetime.datetime.now()
+    seq = int(dt.strftime("%Y%m%d%H%M%S"))
+    f_plot_outpath = f'{seq}-filtered-plot'
+    command.append("-filtered_png")
+    command.append(f'{f_plot_outpath}')
+    no_f_plot_outpath = f'{seq}-non-filtered-plot'
+    command.append("-no_filter_png")
+    command.append(f'{no_f_plot_outpath}')
+    f_data_outpath = f'{seq}-filtered-data.db'
+    command.append("-filtered_db")
+    command.append(f'{f_data_outpath}')
+    subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    os.remove('temp_ana_ref.db')
+    f_plot_outpath = f'../cgi-bin/api/{f_plot_outpath}.png'
+    no_f_plot_outpath = f'../cgi-bin/api/{no_f_plot_outpath}.png'
+    f_data_outpath = f'../cgi-bin/api/{f_data_outpath}'
+    return {
+            'success': True,
+            'output': {'filtered plot': f_plot_outpath, 'non-filtered plot': no_f_plot_outpath, 'filtered data': f_data_outpath}
+        }
+
+
+
+
+
+    
+
 
 
 def main():
@@ -120,14 +192,18 @@ def main():
                 'gor_4': form.getvalue('gor_4'),
             }
             result = {'data': execute_train_subprocess(gor_data)}
-        elif mode == 'clean':
-            mod_name = form.getvalue('mod_name')
-            if mod_name:
-                mod_name = mod_name.split('/')[-1].strip()
-                os.remove(f'{mod_name}')
-                result = {'cleaned up'}
-            else:
-                result = {'error': 'No mod_name provided'}
+        elif mode == 'validate':
+            val_data = {
+                'pred_v': form['pred_v'].file.read(),
+                'ref_v': form['ref_v'].file.read(),
+            }
+            result = {'data': execute_validation_subprocess(val_data)}
+        elif mode == 'analyze':
+            ana_data = {
+                'threshold': form.getvalue('th_a'),
+                'ref_a': form['ref_a'].file.read(),
+            }
+            result = {'data': execute_analytics_subprocess(ana_data)}
     except Exception as e:
         result = {'error': str(e)}
 

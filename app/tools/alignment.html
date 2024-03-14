@@ -43,6 +43,12 @@
 
        function run_alignment(event){
         event.preventDefault();
+
+        let run = document.getElementById('run_a')
+        let loading = document.getElementById('loading_a')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
+
         const form_data = new FormData();
         form_data.append('pdbId', document.getElementById('pdbId').value);
         form_data.append('pdbId2', document.getElementById('pdbId2').value);
@@ -62,28 +68,43 @@
         form_data.append('nw', document.getElementById('nw').checked);
         form_data.append('gt', document.getElementById('gt').checked);
         form_data.append('mat_f', document.getElementById('mat_f').files[0]);
+        form_data.append('downl_f', document.getElementById('downl_f').checked);
+        const download_status = document.getElementById('downl_f').checked;
 
-        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/alignment.py', {
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/alignment.py?mode=predict', {
         method: 'POST',
         body: form_data
         })
         .then(response => response.json())
         .then(data => {
-            //console.log(data);
+            console.log(data);
             const output = data['data']['output']
-            show_alignment(output);
+            if (download_status){
+                show_download_link(output, 'alignmentOutput');
+            } else {
+                show_alignment(output);
+            }
         })
         .catch(error => {
             console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'text-blue-300 text-xs font-semibold';
+            loading.style.display = 'none';
         });
 
         function show_alignment(data){
+            
 
             const dataList = data.split('>')[1].split('\n');
+            console.log(dataList);
 
 
 
             var output = document.getElementById('alignmentOutput');
+            if (output.hasChildNodes()) {
+                    output.innerHTML = '';
+                }
             output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
             var outputContainer = document.createElement('div');
             outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
@@ -92,7 +113,7 @@
             outputHeader.innerHTML = 'Output:';
             outputContainer.appendChild(outputHeader);
             const outputSequenceContainer = document.createElement('div');
-            outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300');
+            outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300', 'overflow-scroll');
             const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
             const outputSequenceHeader = document.createElement('h1');
             outputSequenceHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
@@ -101,7 +122,7 @@
             outputSequenceContainer.appendChild(outputSequenceHeader);
             for (let i = 1; i < dataList.length; i++) {
                 const outputSequence = document.createElement('p');
-                outputSequence.classList.add('text-xs', 'font-normal', 'txt-lgt');
+                outputSequence.classList.add('text-xs', 'font-normal', 'txt-lgt', 'whitespace-nowrap');
                 outputSequence.style = codeFontStyle;
                 outputSequence.innerHTML = dataList[i];
                 outputSequenceContainer.appendChild(outputSequence);
@@ -113,6 +134,123 @@
         }
         
        }
+
+       function hideInfo(){
+            var info = document.getElementById('validationPlots');
+            var hideButton = document.getElementById('valShow');
+            if (info.classList.contains('hidden')){
+                info.classList.remove('hidden');
+                hideButton.innerHTML = 'Hide';
+            } else {
+                info.classList.add('hidden');
+                hideButton.innerHTML = 'Show';
+            }
+        }
+
+        function run_vali(event) {
+            event.preventDefault();
+
+            let run = document.getElementById('run_v')
+            let loading = document.getElementById('loading_v')
+            run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+            loading.style.display = 'inline-block';
+
+            const form_data = new FormData();
+            form_data.append('vali_f', document.getElementById('vali_f').files[0]);
+            form_data.append('downl_v', document.getElementById('downl_v').checked);
+            const download_status = document.getElementById('downl_v').checked;
+
+            fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/alignment.py?mode=validate', {
+            method: 'POST',
+            body: form_data
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                console.log(download_status);
+                const output = data['data']['output']
+                
+                if (download_status){
+                    show_download_link({'validation results':output}, 'valiOutput');
+                } else {
+                    show_validation(output);
+                }
+                
+
+            
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            })
+            .finally(() => {
+                run.className = 'text-blue-300 text-xs font-semibold';
+                loading.style.display = 'none';
+            });
+            
+
+            function show_validation(data){
+                const dataList = data.split('\n');
+                console.log(dataList);
+
+                var output = document.getElementById('valiOutput');
+                if (output.hasChildNodes()) {
+                    output.innerHTML = '';
+                }
+                output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+                var outputContainer = document.createElement('div');
+                outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+                const outputHeader = document.createElement('h1');
+                outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+                outputHeader.innerHTML = 'Output:';
+                outputContainer.appendChild(outputHeader);
+                const outputSequenceContainer = document.createElement('div');
+                outputSequenceContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'px-4', 'py-0.5', 'rounded-lg', 'border', 'border-gray-300', 'overflow-scroll');
+                const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+                for (let i = 0; i < dataList.length; i++) {
+                   
+                    const outputSequence = document.createElement('p');
+                    outputSequence.classList.add('text-xs', 'font-normal', 'txt-lgt', 'whitespace-nowrap');
+                    outputSequence.style = codeFontStyle;
+                    outputSequence.innerHTML = dataList[i];
+                    outputSequenceContainer.appendChild(outputSequence);
+
+
+                    
+                    
+                }
+                outputContainer.appendChild(outputSequenceContainer);
+                output.appendChild(outputContainer);
+                
+            }
+        }
+        function show_download_link(data, tag){
+        var output = document.getElementById(tag);
+        if (output.hasChildNodes()) {
+            output.innerHTML = '';
+        }
+        output.classList.add('w-full', 'flex', 'flex-col', 'items-center', 'justify-start', 'gap-4', 'rounded-lg', 'box', 'p-4', 'mt-4');
+        var outputContainer = document.createElement('div');
+        outputContainer.classList.add('w-full', 'flex', 'flex-col', 'items-start', 'justify-start', 'gap-4', 'rounded-lg');
+        const outputHeader = document.createElement('h1');
+        outputHeader.classList.add('text-xs', 'font-semibold', 'txt-lgt', 'italic');
+        outputHeader.innerHTML = 'Output:';
+        outputContainer.appendChild(outputHeader);
+        const outputSequenceContainer = document.createElement('div');
+        outputSequenceContainer.classList.add('w-full', 'flex', 'flex-row', 'items-center', 'justify-start', 'rounded-lg', 'gap-4');
+        const codeFontStyle = "font-family: 'Courier New', Courier, monospace;";
+        for (const [key, value] of Object.entries(data)) {
+            const outputSequence = document.createElement('a');
+            outputSequence.classList.add('text-xs', 'font-normal', 'lnk');
+            outputSequence.innerHTML = 'Download ' + key;
+            outputSequence.href = value;
+            outputSequence.setAttribute('download', '');
+            outputSequenceContainer.appendChild(outputSequence);
+        }
+        outputContainer.appendChild(outputSequenceContainer);
+        output.appendChild(outputContainer);
+    }
+
+        
 
     </script>
    
@@ -208,6 +346,8 @@
                 <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
                     <p id="upl" class="text-xs font-normal text-gray-600">Upload Matrix</button>
                     <input type="file" id="mat_f">
+                    <label class="text-xs font-normal text-gray-600" for="downl_f">Download result</label>
+                    <input class="w-3 h-3" type="checkbox" id="downl_f" name="checkboxGroup">  
                 </div>
             </div>
 
@@ -216,29 +356,114 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <button id="undo_button" onclick=""><p class="lnk text-lg font-semibold">Undo</p></button>
-            <button id="run_button" onclick="run_alignment(event)"><p class="lnk text-lg font-semibold">Run</p></button>
+            <p id="loading_a" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_a" onclick="run_alignment(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
         <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
            
         <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
-            <p class="text-xs font-normal txt-lgt">Mit dem Alignment Tool werden Gemeinsamkeiten zwischen biologischen Sequenzen gesucht. Dabei werden Nukleotid- oder Proteinsequenzen mit Sequenzdatenbanken verglichen.</p>
+            <p class="text-xs font-normal txt-lgt">&#129516; The script aligns given sequences. Adjust the scoring matrix to account for different types of sequences. (e.g. Protein, Secondary Structure, ...)</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: Sequences and sequence pair combinations to be aligned. Adjust parameters as required for your individual purposes.</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Alignment & corresponding dp Matrices</p>
         </div> 
     </div>
     <div id="alignmentOutput"></div>
-    <div id="validationPlots" class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
-        <div>
-            <h2 class="text-lg font-semibold txt-lgt">Validation Plots</h2>
-            <p class="text-xs font-normal txt-lgt"> Two files vali.pairs and vali.seqlib are created with a python script from HOMSTRAD folder containing all superfamilies with corresponding alignments. vali.seqlib contains all sequences found in the HOMSTRAD folder identified via a unique header. vali.pairs contains pairs of sequences (identified via unique header) of a shared superfamily to be aligned (all permutations of sequence pair if superfamily consists of >2 sequences).
-                vali.seqlib contains 3459 sequences from all HOMSTRAD superfamilies.
-                vali.pairs contains 9541 pairs of sequences to be aligned.
-
-                alignment.jar creates a file from vali.pairs and vali.seclib. This file contains entries with a header starting with ">" and followed by 4 lines. Line 1 and 2 correspond to the predicted alignment, line 3 and 4 correspond to the reference alignment, i.e. the HOMSTRAD alignment.
-
-                validateAli.jar takes the output of alignment.jar as input and calculates sensitivity, specificity, mean shift error, inversed mean shift error and coverage (and also identity) comparing the predicted alignment with the reference alignment. statistics are added to the header line, separated by whitespace. </p>
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Validation file:</p>
+                </div>
+                <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="file" id="vali_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                    <label class="text-xs font-normal text-gray-600" for="downl_v">Download result</label>
+                    <input class="w-3 h-3" type="checkbox" id="downl_v" name="checkboxGroup">  
+                </div>
+            </div>  
+                   
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+
+       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <p id="loading_v" style="display: none;" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <button id="run_v" onclick="run_vali(event)"><p class="lnk text-xs font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">&#10004; Evaluate the quality of generated alignments by comparing to a reference.</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: Alignments to be compared against to each other/p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Alignment sequences and corresponding alignment scores, sensitivity, specificity, coverage, mse, inverse mse and sequence identity. FInd more informaiton in teh 'Validation Plots' section </p>
+        </div> 
+    </div>
+    <div id="valiOutput"></div>
+
+
+    
+    <div  class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row items-center justify-between w-full">
+            <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Validation Plots</h2>
+            <button onclick="hideInfo()"><p id="valShow" class="lnk text-xs font-semibold">Show</p></button>
+        </div>
+        <div id="validationPlots" class="hidden">
+            <div>
+            <p class="text-xs font-normal txt-lgt" style="font-size: 1.0em; line-height: 1.6;">
+                <br>
+                Two files vali.pairs and vali.seqlib are created with a python script from HOMSTRAD folder containing all superfamilies with corresponding alignments.
+                <br>
+                File vali.seqlib contains all sequences found in the HOMSTRAD folder identified via a unique header and contains 3459 sequences from all HOMSTRAD superfamilies.
+                <br>
+                File vali.pairs contains pairs of sequences (identified via unique header) of a shared superfamily to be aligned (all combinations of sequence pair if superfamily consists of >2 sequences) and contains 9541 pairs of sequences to be aligned.
+                <br>
+                JAR file alignment.jar creates a file from vali.pairs and vali.seclib. This file contains entries with a header starting with ">" and followed by 4 lines. Line 1 and 2 correspond to the predicted alignment, line 3 and 4 correspond to the reference alignment, i.e. the HOMSTRAD alignment.
+                <br>
+                JAR file validateAli.jar takes the output of alignment.jar as input and calculates sensitivity, specificity, mean shift error, inversed mean shift error, coverage and identity comparing the predicted alignment with the reference alignment. 
+                <br> 
+                Statistics are added to the header line, separated by whitespace.
+                <br>
+                <br>
+                <b>Sensitivity</b> is calculated as number of correctly aligned residues divided by number of residues aligned by the prediction.
+                <br>
+                <b>Specifivity</b> is calculated as number of correctly aligned residues divided by number of residues aligned by the reference alignment.
+                <br>
+                <b>Mean shift error</b> is calculated as sum of shift values in template sequence for all residues with defined shift error divided by number of target sequence residues for which the shift is defined.
+                <br>
+                <b>Inversed mean shift error</b> is mean shift with target and template switched.
+                <br>
+                <b>Coverage</b> is calculated as number of target residues aligned in both reference and candidate alignment divided by residues aligned in the candidate alignment.
+                <br>
+                <br>
+                Reference: <a href="https://users.soe.ucsc.edu/~karplus/papers/ucsc-crl-97-27.pdf" target="_blank">https://users.soe.ucsc.edu/~karplus/papers/ucsc-crl-97-27.pdf</a>
+                <br>
+                <br>
+                All metrics were evaluated on the whole testset for 12 combinations of parameters ([algorithm], [mode], [matrix]) with default values for gap-open and gap-extend cost (-12 and -1, resp.).
+                <br>
+                The 12 combinations are as follows:
+                <br>
+                01.) Needleman-Wunsch, Global, Dayhoff <br>
+                02.) Needleman-Wunsch, Local, Dayhoff <br>
+                03.) Needleman-Wunsch, Freeshift, Dayhoff <br>
+                04.) Needleman-Wunsch, Global, Blosum62 <br>
+                05.) Needleman-Wunsch, Local, Blosum62 <br>
+                06.) Needleman-Wunsch, Freeshift, Blosum62 <br>
+                07.) Gotoh, Global, Dayhoff <br>
+                08.) Gotoh, Local, Dayhoff <br>
+                09.) Gotoh, Freeshift, Dayhoff <br>
+                10.) Gotoh, Global, Blosum62 <br>
+                11.) Gotoh, Local, Blosum62 <br>
+                12.) Gotoh, Freeshift, Blosum62 <br>
+                <br>
+
+            </p>
+        </div>
+        <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Boxplots for all calculated metrics</h2>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/sensitivity_box_plot.png" alt="Sensitivity Box Plot">
                 <p class="text-xs font-semibold txt-lgt italic">Sensitivity Box Plot:</p>
@@ -250,7 +475,7 @@
                 <p class="text-xs font-normal txt-lgt">Specificity values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/mse_box_plot.png" alt="MSE Box Plot">
                 <p class="text-xs font-semibold txt-lgt italic">MSE Box Plot (yaxis log10 scaled):</p>
@@ -262,14 +487,15 @@
                 <p class="text-xs font-normal txt-lgt">IMSE values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/coverage_box_plot.png" alt="Coverage Box Plot">
                 <p class="text-xs font-semibold txt-lgt italic">Coverage Box Plot:</p>
                 <p class="text-xs font-normal txt-lgt">Coverage values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Violin plots for all calculated metrics</h2>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/sensitivity_violin_plot.png" alt="Sensitivity Violin Plot">
                 <p class="text-xs font-semibold txt-lgt italic">Sensitivity Violin Plot:</p>
@@ -281,7 +507,7 @@
                 <p class="text-xs font-normal txt-lgt">Specificity values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/mse_violin_plot.png" alt="MSE Violin Plot">
                 <p class="text-xs font-semibold txt-lgt italic">MSE Violin Plot (limited yaxis(-5,10)):</p>
@@ -293,13 +519,102 @@
                 <p class="text-xs font-normal txt-lgt">IMSE values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
-        <div id="validationPlots" class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
             <div>
                 <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/coverage_violin_plot.png" alt="Coverage Violin Plot">
                 <p class="text-xs font-semibold txt-lgt italic">Coverage Violin Plot:</p>
                 <p class="text-xs font-normal txt-lgt">Coverage values for different parameter combinations tested on HOMSTRAD derived testset.</p>
             </div>
         </div>
+
+        <h2 class="text-lg font-semibold txt-lgt" style="font-size: 1.5em;">Scatter plots for all calculated metrics</h2>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_global_blosum62.png" alt="Scatter plot for combination: Needleman-Wunsch, Global Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Global Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Global Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_local_blosum62.png" alt="Scatter plot for combination: Needleman-Wunsch, Local Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Local Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Local Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_freeshift_blosum62.png" alt="Scatter plot for combination: Needleman-Wunsch, Freeshift Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Freeshift Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Freeshift Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_global_dayhoff.png" alt="Scatter plot for combination: Needleman-Wunsch, Global Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Global Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Global Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_local_dayhoff.png" alt="Scatter plot for combination: Needleman-Wunsch, Local Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Local Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Local Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_nw_freeshift_dayhoff.png" alt="Scatter plot for combination: Needleman-Wunsch, Freeshift Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Needleman-Wunsch, Freeshift Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Freeshift Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+
+
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_global_blosum62.png" alt="Scatter plot for combination: Gotoh, Global Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Global Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Gotoh, Global Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_local_blosum62.png" alt="Scatter plot for combination: Gotoh, Local Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Local Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Gotoh, Local Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_freeshift_blosum62.png" alt="Scatter plot for combination: Gotoh, Freeshift Mode, Blosum62 Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Freeshift Mode, Blosum62 Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Gotoh, Freeshift Mode, Blosum62 Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_global_dayhoff.png" alt="Scatter plot for combination: Gotoh, Global Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Global Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Gotoh, Global Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_local_dayhoff.png" alt="Scatter plot for combination: Gotoh, Local Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Local Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Gotoh, Local Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+        <div  class="flex flex-row justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+            <div>
+                <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/scatter_plots_combinations_gotoh_freeshift_dayhoff.png" alt="Scatter plot for combination: Gotoh, Freeshift Mode, Dayhoff Matrix">
+                <p class="text-xs font-semibold txt-lgt italic">Scatter plot for parameter combination: Gotoh, Freeshift Mode, Dayhoff Matrix:</p>
+                <p class="text-xs font-normal txt-lgt">Scatter plot for all for metric combinations if testset is aligned with Needleman-Wunsch, Freeshift Mode, Dayhoff Matrix.</p>
+            </div>
+        </div>
+    </div>
         
     </div>
     
