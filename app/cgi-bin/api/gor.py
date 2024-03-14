@@ -6,10 +6,11 @@ import re
 import cgi
 import cgitb
 import os
-import datetime 
+import datetime
 
 
 cgitb.enable()
+
 def clean_json(data):
   return re.sub(r'^[^\"]*\"', '"', data)
 
@@ -100,7 +101,7 @@ def execute_validation_subprocess(val_data):
 
     with open('temp_pred.prd', 'w') as f:
         f.write(val_data['pred_v'].decode('utf-8'))
-
+    
     command.append("-p")
     command.append('temp_pred.prd')	
     dt = datetime.datetime.now()
@@ -125,30 +126,29 @@ def execute_validation_subprocess(val_data):
         }
 
 def execute_analytics_subprocess(ana_data):
-    command = ["python3","/home/h/hummelj/propra/gor/similarity/sequenceSimilarity.py"]
+    command = ["/home/h/hummelj/propra/gor/similarity/sequenceSimilarity.py"]
     with open('temp_ana_ref.db', 'w') as f:
         f.write(ana_data['ref_a'].decode('utf-8'))
     command.append("-d")
     command.append('temp_ana_ref.db')
     command.append("-t")
     command.append(ana_data['threshold'])
-
-    dt = datetime.datetime.now()
-    seq = int(dt.strftime("%Y%m%d%H%M%S"))
-    f_plot_outpath = f'{seq}-filtered-plot'
+    splt = ana_data['threshold'].split('.')
+    vs = splt[0] + '_'+ splt[1]
+    f_plot_outpath = f'filter_{vs}'
     command.append("-filtered_png")
-    command.append(f'{f_plot_outpath}')
-    no_f_plot_outpath = f'{seq}-non-filtered-plot'
+    command.append(f_plot_outpath)
+    no_f_plot_outpath = f'no_filter_{vs}'
     command.append("-no_filter_png")
-    command.append(f'{no_f_plot_outpath}')
-    f_data_outpath = f'{seq}-filtered-data.db'
+    command.append(f_plot_outpath)
+    f_data_outpath = f'filter_data_{vs}.db'
     command.append("-filtered_db")
-    command.append(f'{f_data_outpath}')
-    subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    command.append(f_data_outpath)
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     os.remove('temp_ana_ref.db')
-    f_plot_outpath = f'../cgi-bin/api/{f_plot_outpath}.png'
-    no_f_plot_outpath = f'../cgi-bin/api/{no_f_plot_outpath}.png'
-    f_data_outpath = f'../cgi-bin/api/{f_data_outpath}'
+    f_plot_outpath = f'../public/{f_plot_outpath}.png'
+    no_f_plot_outpath = f'../public/{no_f_plot_outpath}.png'
+    f_data_outpath = f'../public/{f_data_outpath}'
     return {
             'success': True,
             'output': {'filtered plot': f_plot_outpath, 'non-filtered plot': no_f_plot_outpath, 'filtered data': f_data_outpath}
